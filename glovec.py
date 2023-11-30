@@ -16,7 +16,6 @@ path = '/content/drive/MyDrive/WE-GloVe/'
 # from google.colab import drive
 # drive.mount('/content/drive')
 
-from typing import final
 from glove import Corpus, Glove
 import pandas as pd
 import numpy as np
