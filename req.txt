@@ -2,5 +2,4 @@ glove-python3
 underthesea
 pandas
 numpy
-re
 tensorflow
