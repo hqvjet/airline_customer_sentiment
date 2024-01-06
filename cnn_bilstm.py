@@ -13,6 +13,8 @@ from keras.layers import Input, Embedding, LSTM, Dropout, Dense, concatenate
 from keras.models import Model
 
 path = 'resources/'
+
+
 # Dataset Prepare
 def getData(file_name):
   file = pd.read_csv(path + file_name)
@@ -22,14 +24,17 @@ def getData(file_name):
 
   return title, text, utils.to_categorical(file['rating'] - 1, num_classes=5)
 
+
 x_train_title, x_train_text, y_train = getData('train.csv')
 x_test_title, x_test_text, y_test = getData('test.csv')
+
 
 def tokenize_data(title, text):
   arr_title = [word_tokenize(sentence, format='text') for sentence in title]
   arr_text = [word_tokenize(sentence, format='text') for sentence in text]
 
   return arr_title, arr_text
+
 
 x_train_title, x_train_text = tokenize_data(x_train_title, x_train_text)
 
@@ -45,10 +50,10 @@ x_test_text_sequence = tokenizer.texts_to_sequences(x_test_text)
 vocab_size = len(tokenizer.word_index) + 1
 MAX_LEN = 512
 
-x_train_title_pad = pad_sequences(x_train_title_sequence, padding = 'post', maxlen = MAX_LEN)
-x_train_text_pad = pad_sequences(x_train_text_sequence, padding = 'post', maxlen = MAX_LEN)
-x_test_title_pad = pad_sequences(x_test_title_sequence, padding = 'post', maxlen = MAX_LEN)
-x_test_text_pad = pad_sequences(x_test_text_sequence, padding = 'post', maxlen = MAX_LEN)
+x_train_title_pad = pad_sequences(x_train_title_sequence, padding='post', maxlen=MAX_LEN)
+x_train_text_pad = pad_sequences(x_train_text_sequence, padding='post', maxlen=MAX_LEN)
+x_test_title_pad = pad_sequences(x_test_title_sequence, padding='post', maxlen=MAX_LEN)
+x_test_text_pad = pad_sequences(x_test_text_sequence, padding='post', maxlen=MAX_LEN)
 
 glove = Glove.load(path + 'gloveModel.model')
 emb_dict = dict()
@@ -111,130 +116,13 @@ BATCH_SIZE = 4
 
 # """# **CNN**"""
 
-from keras.layers import Input, Embedding, Conv1D, MaxPooling1D, Flatten, Dense, concatenate
-from keras.models import Model
-
-embedding_dim = 128
-num_filters = 128
-filter_sizes = [3, 4, 5]
-
-# Input for title
-title_input = Input(shape=(x_train_title_pad.shape[1],))
-title_embedding = Embedding(vocab_size, embedding_dim, input_length=x_train_title_pad.shape[1])(title_input)
-title_conv_blocks = []
-for filter_size in filter_sizes:
-    title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(title_embedding)
-    title_pool = MaxPooling1D(pool_size=x_train_title_pad.shape[1] - filter_size + 1)(title_conv)
-    title_conv_blocks.append(title_pool)
-title_concat = concatenate(title_conv_blocks, axis=-1)
-title_flat = Flatten()(title_concat)
-
-# Input for text
-text_input = Input(shape=(x_train_text_pad.shape[1],))
-text_embedding = Embedding(vocab_size, embedding_dim, input_length=x_train_text_pad.shape[1])(text_input)
-text_conv_blocks = []
-for filter_size in filter_sizes:
-    text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(text_embedding)
-    text_pool = MaxPooling1D(pool_size=x_train_text_pad.shape[1] - filter_size + 1)(text_conv)
-    text_conv_blocks.append(text_pool)
-text_concat = concatenate(text_conv_blocks, axis=-1)
-text_flat = Flatten()(text_concat)
-
-# Combine the two inputs
-combined = concatenate([title_flat, text_flat])
-
-# Additional layers of the model
-dense1 = Dense(128, activation='relu')(combined)
-output = Dense(y_train.shape[1], activation='softmax')(dense1)
-
-# Build the model
-model_CNN = Model(inputs=[title_input, text_input], outputs=output)
-
-model_CNN.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-model_CNN.summary()
-
-from keras.utils import plot_model
-
-plot_model(model_CNN, to_file='modelCNN.png', show_shapes=True, show_layer_names=True)
-
-def train_model(model, X_train, y_train, X_val, y_val, epochs=10, batch_size=32):
-    history = model.fit(
-        [X_train['title'], X_train['text']],
-        y_train,
-        validation_data=([X_val['title'], X_val['text']], y_val),
-        epochs=epochs,
-        batch_size=batch_size
-    )
-    return history
-
-history = model_CNN.fit(
-    [np.array(x_train_title_pad), np.array(x_train_text_pad)],
-    y_train,
-    epochs=EPOCH,
-    batch_size=4,
-    verbose=1,
-    validation_data=([np.array(x_test_title_pad), np.array(x_test_text_pad)], y_test)
-)
-
-# """# **BiLSTM**"""
-
-from keras.layers import Input, Bidirectional, LSTM, Dense, GlobalMaxPooling1D
-from keras.models import Model
-
-def build_bilstm_model():
-    # Define input layers for the title and text inputs
-    title_input = Input(shape=(x_train_title_pad.shape[1],))
-    text_input = Input(shape=(x_train_text_pad.shape[1],))
-
-    # Embedding layer for title
-    title_embedding = Embedding(input_dim=vocab_size, output_dim=embedding_dim, trainable=True)(title_input)
-    # Embedding layer for text
-    text_embedding = Embedding(input_dim=vocab_size, output_dim=embedding_dim, trainable=True)(text_input)
-
-    # Bidirectional LSTM layer for title
-    title_bilstm = Bidirectional(LSTM(64, return_sequences=True))(title_embedding)
-    # Bidirectional LSTM layer for text
-    text_bilstm = Bidirectional(LSTM(64, return_sequences=True))(text_embedding)
-
-    # Global Max Pooling layer for title
-    title_pooling = GlobalMaxPooling1D()(title_bilstm)
-    # Global Max Pooling layer for text
-    text_pooling = GlobalMaxPooling1D()(text_bilstm)
-
-    # Concatenate title and text pooling layers
-    concatenated_pooling = concatenate([title_pooling, text_pooling])
-
-    # Dense layer for final prediction
-    output_layer = Dense(5, activation='softmax')(concatenated_pooling)
-
-    # Create model
-    model = Model(inputs=[title_input, text_input], outputs=output_layer)
-
-    return model
-
-# Build the BiLSTM model
-model_BiLSTM = build_bilstm_model()
-model_BiLSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-model_BiLSTM.summary()
-
-from keras.utils import plot_model
-
-plot_model(model_BiLSTM, to_file='modelBiLSTM.png', show_shapes=True, show_layer_names=True)
-
-history = model_BiLSTM.fit(
-    [np.array(x_train_title_pad), np.array(x_train_text_pad)],
-    y_train,
-    epochs=EPOCH,
-    batch_size=4,
-    verbose=1,
-    validation_data=([np.array(x_test_title_pad), np.array(x_test_text_pad)], y_test)
-)
 
 # """# **BiLSTM + CNN**"""
 
 from keras.layers import Input, concatenate, Dense, Concatenate, Bidirectional, LSTM, Conv1D, GlobalMaxPooling1D
 from keras.models import Model
 from keras import backend as K
+
 
 def build_ensemble_model(model_BiLSTM, model_CNN):
     # Define input layers for the title and text inputs
@@ -259,6 +147,7 @@ def build_ensemble_model(model_BiLSTM, model_CNN):
     ensemble_model = Model(inputs=[title_input, text_input], outputs=output_layer)
 
     return ensemble_model
+
 
 # Build the ensemble model
 model_ensemble_bilstm_cnn = build_ensemble_model(model_BiLSTM, model_CNN)
