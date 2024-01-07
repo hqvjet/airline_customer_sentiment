@@ -88,11 +88,9 @@ class CNN:
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
         )
-
-        return history
     
-    def testModel(self, x_test, y_test, model):
-        y_pred = model.predict(x_test)
+    def testModel(self, x_test, y_test):
+        y_pred = self.model.predict(x_test)
         pred = np.argmax(y_pred,axis=1)
         report = classification_report(y_test, pred)
 

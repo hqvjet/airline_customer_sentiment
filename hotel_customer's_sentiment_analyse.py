@@ -93,6 +93,5 @@ CNN_history = cnn.trainModel()
 
 cnn.testModel(
   [np.array(x_test_title_pad), np.array(x_test_text_pad)], 
-  np.array(y_test), 
-  CNN_history
+  np.array(y_test)
 )
