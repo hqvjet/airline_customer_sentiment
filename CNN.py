@@ -2,6 +2,7 @@ from keras.layers import Input, Embedding, Conv1D, MaxPooling1D, Flatten, Dense,
 from keras.models import Model
 import numpy as np
 from sklearn.metrics import classification_report
+from tensorflow.keras import utils
 
 
 class CNN:
@@ -92,7 +93,7 @@ class CNN:
     def testModel(self, x_test, y_test):
         y_pred = self.model.predict(x_test)
         pred = np.argmax(y_pred,axis=1)
-        report = classification_report(y_test, pred)
+        report = classification_report(y_test, utils.to_categorical(pred, num_classes=5))
 
         print(report)
         with open('classification_report.txt', 'w') as file:
