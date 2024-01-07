@@ -41,7 +41,7 @@ class CNN:
         filter_sizes = [3, 4, 5]
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
-        title_embedding = Embedding(self.vocab_size, self.embedding_dim, weights=[self.embedding_matrix], input_length=self.train_title.shape[1], trainable=False)(self.title_input)
+        title_embedding = Embedding(self.vocab_size, self.embedding_dim, weights=[self.embedding_matrix], input_length=self.train_title.shape[1], trainable=True)(self.title_input)
         title_conv_blocks = []
         for filter_size in filter_sizes:
             title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(title_embedding)
@@ -52,7 +52,7 @@ class CNN:
 
         # Input for text
         self.text_input = Input(shape=(self.train_text.shape[1],))
-        text_embedding = Embedding(self.vocab_size, self.embedding_dim, weights=[self.embedding_matrix], input_length=self.train_text.shape[1], trainable=False)(self.text_input)
+        text_embedding = Embedding(self.vocab_size, self.embedding_dim, weights=[self.embedding_matrix], input_length=self.train_text.shape[1], trainable=True)(self.text_input)
         text_conv_blocks = []
         for filter_size in filter_sizes:
             text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(text_embedding)
