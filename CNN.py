@@ -91,7 +91,7 @@ class CNN:
 
         return history
     
-    def testModel(x_test, y_test, model):
+    def testModel(self, x_test, y_test, model):
         y_pred = model.predict(x_test)
         pred = np.argmax(y_pred,axis=1)
         report = classification_report(y_test, pred)
