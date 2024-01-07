@@ -14,6 +14,7 @@ class CNN:
             val_text,
             val_rating,
             vocab_size,
+            embedding_matrix,
             embedding_dim,
             epoch,
             batch_size
@@ -30,6 +31,7 @@ class CNN:
         self.val_title = val_title
         self.val_text = val_text
         self.val_rating = val_rating
+        self.embedding_matrix = embedding_matrix
         self.output = self.getOutput() 
         self.model = self.buildModel()
 
@@ -39,7 +41,7 @@ class CNN:
         filter_sizes = [3, 4, 5]
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
-        title_embedding = Embedding(self.vocab_size, self.embedding_dim, input_length=self.train_title.shape[1])(self.title_input)
+        title_embedding = Embedding(self.vocab_size, self.embedding_dim, weights=[self.embedding_matrix], input_length=self.train_title.shape[1], trainable=False)(self.title_input)
         title_conv_blocks = []
         for filter_size in filter_sizes:
             title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(title_embedding)
@@ -50,7 +52,7 @@ class CNN:
 
         # Input for text
         self.text_input = Input(shape=(self.train_text.shape[1],))
-        text_embedding = Embedding(self.vocab_size, self.embedding_dim, input_length=self.train_text.shape[1])(self.text_input)
+        text_embedding = Embedding(self.vocab_size, self.embedding_dim, weights=[self.embedding_matrix], input_length=self.train_text.shape[1], trainable=False)(self.text_input)
         text_conv_blocks = []
         for filter_size in filter_sizes:
             text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(text_embedding)
@@ -83,7 +85,7 @@ class CNN:
             epochs=self.epoch,
             batch_size=self.batch_size,
             verbose=1,
-            validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating)
+            validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
         )
 
         return history

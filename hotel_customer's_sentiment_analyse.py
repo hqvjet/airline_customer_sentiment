@@ -14,8 +14,6 @@ from BiLSTM import BiLSTM
 from LSTM import LSTM
 from CNN import CNN
 
-# ---------------------------------------------- GLOVE for what ?, in this code, there is no GLOVE usage ----------------------------------------------------------------------------
-
 # Dataset Prepare
 def getData(file_name):
   file = pd.read_csv(PATH + file_name)
@@ -24,7 +22,6 @@ def getData(file_name):
   text = pd.Series([re.sub(r'\s+', ' ', sent) for sent in file['text'].apply(str)])
 
   return title, text, utils.to_categorical(file['rating'] - 1, num_classes=5)
-
 
 x_train_title, x_train_text, y_train = getData('train.csv')
 x_test_title, x_test_text, y_test = getData('test.csv')
@@ -40,65 +37,44 @@ x_train_title, x_train_text = tokenize_data(x_train_title, x_train_text)
 
 x_train_title, x_val_title, x_train_text, x_val_text, y_train, y_val = train_test_split(x_train_title, x_train_text, y_train, test_size=0.1) 
 
-# # """Convert to sequences""
-# tokenizer = Tokenizer()
+# """Convert to sequences""
+tokenizer = Tokenizer()
 
-# tokenizer.fit_on_texts([x_train_title, x_train_text])
+tokenizer.fit_on_texts([x_train_title, x_train_text])
 
-# x_train_title_sequence = tokenizer.texts_to_sequences(x_train_title)
-# x_train_text_sequence = tokenizer.texts_to_sequences(x_train_text)
-# x_val_title_sequence = tokenizer.texts_to_sequences(x_val_title)
-# x_val_text_sequence = tokenizer.texts_to_sequences(x_val_text)
-# x_test_title_sequence = tokenizer.texts_to_sequences(x_test_title)
-# x_test_text_sequence = tokenizer.texts_to_sequences(x_test_text)
+x_train_title_sequence = tokenizer.texts_to_sequences(x_train_title)
+x_train_text_sequence = tokenizer.texts_to_sequences(x_train_text)
+x_val_title_sequence = tokenizer.texts_to_sequences(x_val_title)
+x_val_text_sequence = tokenizer.texts_to_sequences(x_val_text)
+x_test_title_sequence = tokenizer.texts_to_sequences(x_test_title)
+x_test_text_sequence = tokenizer.texts_to_sequences(x_test_text)
 
-# # """Padding sequences to the same dimensions"""
-# vocab_size = len(tokenizer.word_index) + 1
+# """Padding sequences to the same dimensions"""
+vocab_size = len(tokenizer.word_index) + 1
 
-# x_train_title_pad = pad_sequences(x_train_title_sequence, padding='post', maxlen=MAX_LEN)
-# x_train_text_pad = pad_sequences(x_train_text_sequence, padding='post', maxlen=MAX_LEN)
-# x_val_title_pad = pad_sequences(x_val_title_sequence, padding='post', maxlen=MAX_LEN)
-# x_val_text_pad = pad_sequences(x_val_text_sequence, padding='post', maxlen=MAX_LEN)
-# x_test_title_pad = pad_sequences(x_test_title_sequence, padding='post', maxlen=MAX_LEN)
-# x_test_text_pad = pad_sequences(x_test_text_sequence, padding='post', maxlen=MAX_LEN)
+x_train_title_pad = pad_sequences(x_train_title_sequence, padding='post', maxlen=MAX_LEN)
+x_train_text_pad = pad_sequences(x_train_text_sequence, padding='post', maxlen=MAX_LEN)
+x_val_title_pad = pad_sequences(x_val_title_sequence, padding='post', maxlen=MAX_LEN)
+x_val_text_pad = pad_sequences(x_val_text_sequence, padding='post', maxlen=MAX_LEN)
+x_test_title_pad = pad_sequences(x_test_title_sequence, padding='post', maxlen=MAX_LEN)
+x_test_text_pad = pad_sequences(x_test_text_sequence, padding='post', maxlen=MAX_LEN)
 
 # """## **GLOVE EMBEDDING IMPLEMENTATION AND USAGE**"""
 glove = Glove.load(PATH + 'gloveModel.model')
 emb_dict = dict()
-
-word_dict = glove.dictionary
 word_vectors = glove.word_vectors
-vocab_size = len(word_dict)
-print(vocab_size)
 
-def getGloveMatrix(data):
-  res = []
-  for sentence in data:
-    temp = []
-    for word in sentence.split():
-      if word in word_dict:
-        temp.append(word_vectors[word_dict[word]])
-      else:
-        temp.append([0] * EMBEDDING_DIM)
-    res.append(temp)
+for word in list(glove.dictionary.keys()):
+  emb_dict[word] = glove.word_vectors[glove.dictionary[word]]
 
-  return res
-
-x_train_title_input = getGloveMatrix(x_train_title)
-x_train_text_input = getGloveMatrix(x_train_text)
-x_val_title_input = getGloveMatrix(x_val_title)
-x_val_text_input = getGloveMatrix(x_val_text)
-x_test_title_input = getGloveMatrix(x_test_title)
-x_test_text_input = getGloveMatrix(x_test_text)
-
-x_train_title_pad = pad_sequences(x_train_title_input, padding='post', maxlen=MAX_LEN)
-x_train_text_pad = pad_sequences(x_train_text_input, padding='post', maxlen=MAX_LEN)
-x_val_title_pad = pad_sequences(x_val_title_input, padding='post', maxlen=MAX_LEN)
-x_val_text_pad = pad_sequences(x_val_text_input, padding='post', maxlen=MAX_LEN)
-x_test_title_pad = pad_sequences(x_test_title_input, padding='post', maxlen=MAX_LEN)
-x_test_text_pad = pad_sequences(x_test_text_input, padding='post', maxlen=MAX_LEN)
+emb_matrix = np.zeros((vocab_size, MAX_LEN))
+for word, index in tokenizer.word_index.items():
+  emb_vector = emb_dict.get(word)
+  if emb_vector is not None:
+    emb_matrix[index] = emb_vector
 
 
+# MODEL IMPLEMENTATION AND TRAINING
 cnn = CNN(
   x_train_title_pad,
   x_train_text_pad,
@@ -107,6 +83,7 @@ cnn = CNN(
   x_val_text_pad,
   y_val,
   vocab_size,
+  emb_matrix,
   EMBEDDING_DIM,
   EPOCH,
   BATCH_SIZE
