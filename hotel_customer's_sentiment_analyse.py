@@ -67,7 +67,7 @@ word_vectors = glove.word_vectors
 for word in list(glove.dictionary.keys()):
   emb_dict[word] = glove.word_vectors[glove.dictionary[word]]
 
-emb_matrix = np.zeros((vocab_size, MAX_LEN))
+emb_matrix = np.zeros((vocab_size, EMBEDDING_DIM))
 for word, index in tokenizer.word_index.items():
   emb_vector = emb_dict.get(word)
   if emb_vector is not None:
@@ -90,3 +90,9 @@ cnn = CNN(
 )
 
 CNN_history = cnn.trainModel()
+
+cnn.testModel(
+  [np.array(x_test_title_pad), np.array(x_test_text_pad)], 
+  np.array(y_test), 
+  CNN_history
+)

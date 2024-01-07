@@ -13,7 +13,7 @@ def getData(file_name):
   title = pd.Series([re.sub(r'\s+', ' ', sent) for sent in file['title'].apply(str)])
   text = pd.Series([re.sub(r'\s+', ' ', sent) for sent in file['text'].apply(str)])
 
-  return title.apply(str).append(text)
+  return pd.concat([title, text])
 
 data = getData('train.csv')
 
