@@ -18,8 +18,8 @@ from CNN import CNN
 def getData(file_name):
   file = pd.read_csv(PATH + file_name)
 
-  title = pd.Series([re.sub(r'\s+', ' ', sent) for sent in file['title'].apply(str)])
-  text = pd.Series([re.sub(r'\s+', ' ', sent) for sent in file['text'].apply(str)])
+  title = pd.Series([re.sub(r'\s+', ' ', re.sub(r'"', '', sent)) for sent in file['title'].apply(str)])
+  text = pd.Series([re.sub(r'\s+', ' ', re.sub(r'"', '', sent)) for sent in file['text'].apply(str)])
 
   return title, text, utils.to_categorical(file['rating'] - 1, num_classes=5)
 
