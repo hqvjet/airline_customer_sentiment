@@ -37,7 +37,7 @@ class CNN:
 
     def getOutput(self):
         # Input for title
-        num_filters = 128
+        num_filters = self.embedding_dim
         filter_sizes = [3, 4, 5]
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
@@ -65,7 +65,7 @@ class CNN:
         combined = concatenate([title_flat, text_flat])
 
         # Additional layers of the model
-        dense1 = Dense(128, activation='relu')(combined)
+        dense1 = Dense(self.embedding_dim, activation='relu')(combined)
 
         return Dense(self.train_rating.shape[1], activation='softmax')(dense1)
 
