@@ -7,11 +7,15 @@ from constants import *
 
 # """## **PREPARE DATA**"""
 
+def normalizeSentence(sentence):
+  sentence = re.sub(r'[^\w\s]', '', sentence)
+  return sentence.lower()
+
 def getData(file_name):
   file = pd.read_csv(PATH + file_name)
 
-  title = pd.Series([re.sub(r'\s+', ' ', sent) for sent in file['title'].apply(str)])
-  text = pd.Series([re.sub(r'\s+', ' ', sent) for sent in file['text'].apply(str)])
+  title = pd.Series([normalizeSentence(sent) for sent in file['title'].apply(str)])
+  text = pd.Series([normalizeSentence(sent) for sent in file['text'].apply(str)])
 
   return pd.concat([title, text])
 
