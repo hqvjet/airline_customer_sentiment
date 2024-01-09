@@ -2,6 +2,7 @@ from keras.layers import Input, Embedding, Conv1D, MaxPooling1D, Flatten, Dense,
 from keras.models import Model
 import numpy as np
 from sklearn.metrics import classification_report
+from constants import *
 from tensorflow.keras import utils
 
 
@@ -16,15 +17,9 @@ class CNN:
             val_text,
             val_rating,
             vocab_size,
-            embedding_matrix,
-            embedding_dim,
-            epoch,
-            batch_size
+            embedding_matrix
     ):
-        self.embedding_dim = embedding_dim
         self.vocab_size = vocab_size
-        self.epoch = epoch
-        self.batch_size = batch_size
         self.title_input = None
         self.text_input = None
         self.train_title = train_title
@@ -43,7 +38,7 @@ class CNN:
         filter_sizes = [2, 3, 4, 5]
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
-        title_embedding = Embedding(self.vocab_size, self.embedding_dim, weights=[self.embedding_matrix], input_length=self.train_title.shape[1], trainable=False)(self.title_input)
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, weights=[self.embedding_matrix], input_length=self.train_title.shape[1], trainable=True)(self.title_input)
         title_conv_blocks = []
         for filter_size in filter_sizes:
             title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(title_embedding)
@@ -54,7 +49,7 @@ class CNN:
 
         # Input for text
         self.text_input = Input(shape=(self.train_text.shape[1],))
-        text_embedding = Embedding(self.vocab_size, self.embedding_dim, weights=[self.embedding_matrix], input_length=self.train_text.shape[1], trainable=False)(self.text_input)
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, weights=[self.embedding_matrix], input_length=self.train_text.shape[1], trainable=True)(self.text_input)
         text_conv_blocks = []
         for filter_size in filter_sizes:
             text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(text_embedding)
@@ -84,11 +79,13 @@ class CNN:
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
-            epochs=self.epoch,
-            batch_size=self.batch_size,
+            epochs=EPOCH,
+            batch_size=BATCH_SIZE,
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
         )
+
+        self.model.save(PATH + 'CNN.h5')
     
     def testModel(self, x_test, y_test):
         y_pred = self.model.predict(x_test)

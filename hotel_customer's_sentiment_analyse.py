@@ -83,10 +83,7 @@ cnn = CNN(
   x_val_text_pad,
   y_val,
   vocab_size,
-  emb_matrix,
-  EMBEDDING_DIM,
-  EPOCH,
-  BATCH_SIZE
+  emb_matrix
 )
 
 CNN_history = cnn.trainModel()
