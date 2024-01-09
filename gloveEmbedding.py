@@ -4,12 +4,9 @@ import numpy as np
 import re
 from underthesea import word_tokenize
 from constants import *
+from Nomarlize import normalizeSentence
 
 # """## **PREPARE DATA**"""
-
-def normalizeSentence(sentence):
-  sentence = re.sub(r'[^\w\s]', '', sentence)
-  return sentence.lower()
 
 def getData(file_name):
   file = pd.read_csv(PATH + file_name)

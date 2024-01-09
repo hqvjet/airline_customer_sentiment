@@ -62,7 +62,7 @@ class CNN:
         combined = concatenate([title_flat, text_flat])
 
         # Additional layers of the model
-        dense1 = Dense(128, activation='relu')(combined)
+        dense1 = Dense(512, activation='relu')(combined)
 
         return Dense(self.train_rating.shape[1], activation='softmax')(dense1)
 

@@ -13,13 +13,14 @@ from constants import *
 from BiLSTM import BiLSTM
 from LSTM import LSTM
 from CNN import CNN
+from Nomarlize import normalizeSentence
 
 # Dataset Prepare
 def getData(file_name):
   file = pd.read_csv(PATH + file_name)
 
-  title = pd.Series([re.sub(r'\s+', ' ', re.sub(r'"', '', sent)) for sent in file['title'].apply(str)])
-  text = pd.Series([re.sub(r'\s+', ' ', re.sub(r'"', '', sent)) for sent in file['text'].apply(str)])
+  title = pd.Series([normalizeSentence(sent) for sent in file['title'].apply(str)])
+  text = pd.Series([normalizeSentence(sent) for sent in file['text'].apply(str)])
 
   return title, text, utils.to_categorical(file['rating'] - 1, num_classes=5)
 
@@ -89,6 +90,24 @@ cnn = CNN(
 CNN_history = cnn.trainModel()
 
 cnn.testModel(
+  [np.array(x_test_title_pad), np.array(x_test_text_pad)], 
+  np.array(y_test)
+)
+
+lstm = LSTM(
+  x_train_title_pad,
+  x_train_text_pad,
+  y_train,
+  x_val_title_pad,
+  x_val_text_pad,
+  y_val,
+  vocab_size,
+  emb_matrix
+)
+
+lstm_history = lstm.trainModel()
+
+lstm.testModel(
   [np.array(x_test_title_pad), np.array(x_test_text_pad)], 
   np.array(y_test)
 )
