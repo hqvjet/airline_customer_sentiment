@@ -38,7 +38,7 @@ x_train_title, x_train_text = tokenize_data(x_train_title, x_train_text)
 
 x_train_title, x_val_title, x_train_text, x_val_text, y_train, y_val = train_test_split(x_train_title, x_train_text, y_train, test_size=0.1) 
 
-# """Convert to sequences""
+# Convert to sequences
 tokenizer = Tokenizer()
 
 tokenizer.fit_on_texts([x_train_title, x_train_text])
@@ -50,7 +50,7 @@ x_val_text_sequence = tokenizer.texts_to_sequences(x_val_text)
 x_test_title_sequence = tokenizer.texts_to_sequences(x_test_title)
 x_test_text_sequence = tokenizer.texts_to_sequences(x_test_text)
 
-# """Padding sequences to the same dimensions"""
+# Padding sequences to the same dimensions
 vocab_size = len(tokenizer.word_index) + 1
 
 x_train_title_pad = pad_sequences(x_train_title_sequence, padding='post', maxlen=MAX_LEN)
@@ -60,7 +60,7 @@ x_val_text_pad = pad_sequences(x_val_text_sequence, padding='post', maxlen=MAX_L
 x_test_title_pad = pad_sequences(x_test_title_sequence, padding='post', maxlen=MAX_LEN)
 x_test_text_pad = pad_sequences(x_test_text_sequence, padding='post', maxlen=MAX_LEN)
 
-# """## **GLOVE EMBEDDING IMPLEMENTATION AND USAGE**"""
+# GLOVE EMBEDDING IMPLEMENTATION AND USAGE
 glove = Glove.load(PATH + 'gloveModel.model')
 emb_dict = dict()
 word_vectors = glove.word_vectors
@@ -76,38 +76,39 @@ for word, index in tokenizer.word_index.items():
 
 
 # MODEL IMPLEMENTATION AND TRAINING
-cnn = CNN(
-  x_train_title_pad,
-  x_train_text_pad,
-  y_train,
-  x_val_title_pad,
-  x_val_text_pad,
-  y_val,
-  vocab_size,
-  emb_matrix
-)
+def startLearning():
+  cnn = CNN(
+    x_train_title_pad,
+    x_train_text_pad,
+    y_train,
+    x_val_title_pad,
+    x_val_text_pad,
+    y_val,
+    vocab_size,
+    emb_matrix
+  )
 
-CNN_history = cnn.trainModel()
+  CNN_history = cnn.trainModel()
 
-cnn.testModel(
-  [np.array(x_test_title_pad), np.array(x_test_text_pad)], 
-  np.array(y_test)
-)
+  cnn.testModel(
+    [np.array(x_test_title_pad), np.array(x_test_text_pad)], 
+    np.array(y_test)
+  )
 
-lstm = LSTM(
-  x_train_title_pad,
-  x_train_text_pad,
-  y_train,
-  x_val_title_pad,
-  x_val_text_pad,
-  y_val,
-  vocab_size,
-  emb_matrix
-)
+  lstm = LSTM(
+    x_train_title_pad,
+    x_train_text_pad,
+    y_train,
+    x_val_title_pad,
+    x_val_text_pad,
+    y_val,
+    vocab_size,
+    emb_matrix
+  )
 
-lstm_history = lstm.trainModel()
+  lstm_history = lstm.trainModel()
 
-lstm.testModel(
-  [np.array(x_test_title_pad), np.array(x_test_text_pad)], 
-  np.array(y_test)
-)
+  lstm.testModel(
+    [np.array(x_test_title_pad), np.array(x_test_text_pad)], 
+    np.array(y_test)
+  )
