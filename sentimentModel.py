@@ -13,7 +13,7 @@ from constants import *
 from BiLSTM import BiLSTM
 from LSTM import LSTM
 from CNN import CNN
-from Nomarlize import normalizeSentence
+from Nomarlize import normalizeSentence, statusToNumber
 
 # Dataset Prepare
 def getData(file_name):
@@ -21,8 +21,9 @@ def getData(file_name):
 
   title = pd.Series([normalizeSentence(sent) for sent in file['title'].apply(str)])
   text = pd.Series([normalizeSentence(sent) for sent in file['text'].apply(str)])
+  rating = pd.Series([statusToNumber(sent) for sent in file['rating'].apply(str)])
 
-  return title, text, utils.to_categorical(file['rating'] - 1, num_classes=5)
+  return title, text, utils.to_categorical(rating - 1, num_classes=3)
 
 x_train_title, x_train_text, y_train = getData('train.csv')
 x_test_title, x_test_text, y_test = getData('test.csv')

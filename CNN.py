@@ -35,7 +35,7 @@ class CNN:
     def getOutput(self):
         # Input for title
         num_filters = 128
-        filter_sizes = [2, 3, 4, 5]
+        filter_sizes = [3, 4, 5]
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, weights=[self.embedding_matrix], input_length=self.train_title.shape[1], trainable=True)(self.title_input)
@@ -90,7 +90,7 @@ class CNN:
     def testModel(self, x_test, y_test):
         y_pred = self.model.predict(x_test)
         pred = np.argmax(y_pred,axis=1)
-        report = classification_report(y_test, utils.to_categorical(pred, num_classes=5))
+        report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
 
         print(report)
         with open('classification_report.txt', 'w') as file:

@@ -9,3 +9,11 @@ def normalizeSentence(sentence):
 
     return sentence.lower()
 
+def statusToNumber(sentence):
+    if sentence == 'neg':
+        return 1
+    elif sentence == 'neu':
+        return 2
+    elif sentence == 'pos':
+        return 3
+
