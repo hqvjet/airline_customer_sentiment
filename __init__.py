@@ -8,5 +8,5 @@ def checkForGPU():
     print('Found GPU at: {}'.format(device_name))
 
 if __name__ == '__main__':
-    checkForGPU()
+    # checkForGPU()
     startLearning()
