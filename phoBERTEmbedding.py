@@ -28,7 +28,7 @@ def getPhoBERTFeatures():
 
     data = [word_tokenize(sentence, format='text') for sentence in data]
 
-    tokenized = data['text'].apply((lambda x: tokenizer.encode(x, add_special_tokens=True))) # HIGH RISK
+    tokenized = data.apply((lambda x: tokenizer.encode(x, add_special_tokens=True))) # HIGH RISK
 
     padded = pad_sequences(tokenized.values, maxlen=MAX_LEN, dtype="long", value=0, truncating="post", padding="post")
     # print('padded:', padded[1])
