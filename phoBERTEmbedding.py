@@ -30,11 +30,11 @@ def getPhoBERTFeatures():
 
     data = pd.Series([word_tokenize(sentence, format='text') for sentence in data])
 
-    tokenized = data.apply((lambda x: tokenizer.encode(x, add_special_tokens=True))) # HIGH RISK
+    encoder = pd.Series([tokenizer.encode(encode) for encode in data]) # HIGH RISK
 
-    padded = pad_sequences(tokenized.values, maxlen=MAX_LEN, dtype="long", value=0, truncating="post", padding="post")
-    # print('padded:', padded[1])
-    # print('len padded:', padded.shape)
+    padded = np.array([i + [1] * (MAX_LEN - len(i)) for i in encoder])
+    print('padded:', padded[1])
+    print('len padded:', padded.shape)
 
     #get attention mask ( 0: not has word, 1: has word)
     attention_mask = np.where(padded==0, 0, 1)
