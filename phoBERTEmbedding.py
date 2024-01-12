@@ -1,3 +1,5 @@
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 from transformers import AutoTokenizer, AutoModel
 from underthesea import word_tokenize
 from sklearn.model_selection import train_test_split
@@ -43,8 +45,8 @@ def getPhoBERTFeatures():
     attention_mask = torch.tensor(attention_mask)
 
     # Train model
-    print('TRAINNING PHOBERT MODEL')
     with torch.no_grad():
+        print('TRAINNING PHOBERT MODEL')
         last_hidden_states = phoBERT(input_ids=padded, attention_mask=attention_mask)
     #     print('last hidden states:', last_hidden_states)
     features = last_hidden_states[0][:,0,:].numpy()
