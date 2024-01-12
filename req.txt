@@ -1,5 +1,5 @@
-glove-python3
-underthesea
 pandas
 numpy
 tensorflow
+torch
+transformers

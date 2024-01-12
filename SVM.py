@@ -5,8 +5,12 @@ from sklearn.metrics import classification_report
 from constants import *
 from tensorflow.keras import utils
 
+# Thư viện train SVM
+from sklearn.svm import SVC
+from joblib import dump
 
-class CNN:
+
+class SVM:
 
     def __init__(
             self,
@@ -29,7 +33,7 @@ class CNN:
         self.val_text = val_text
         self.val_rating = val_rating
         self.phoBERT_features = phoBERT_features
-        self.output = self.getOutput() 
+        # self.output = self.getOutput() 
         self.model = self.buildModel()
 
     def getOutput(self):
@@ -37,20 +41,22 @@ class CNN:
         num_filters = 128
         filter_sizes = [3, 4, 5]
         
-        self.title_input = Input(shape=(self.phoBERT_features.shape[1], self.phoBERT_features.shape[2]))
+        self.title_input = Input(shape=(self.train_title.shape[1],))
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, weights=[self.embedding_matrix], input_length=self.train_title.shape[1], trainable=True)(self.title_input)
         title_conv_blocks = []
         for filter_size in filter_sizes:
-            title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(self.title_input)
+            title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(title_embedding)
             title_pool = MaxPooling1D(pool_size=self.train_title.shape[1] - filter_size + 1)(title_conv)
             title_conv_blocks.append(title_pool)
         title_concat = concatenate(title_conv_blocks, axis=-1)
         title_flat = Flatten()(title_concat)
 
         # Input for text
-        self.text_input = Input(shape=(self.phoBERT_features.shape[1], self.phoBERT_features.shape[2]))
+        self.text_input = Input(shape=(self.train_text.shape[1],))
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, weights=[self.embedding_matrix], input_length=self.train_text.shape[1], trainable=True)(self.text_input)
         text_conv_blocks = []
         for filter_size in filter_sizes:
-            text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(self.text_input)
+            text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(text_embedding)
             text_pool = MaxPooling1D(pool_size=self.train_text.shape[1] - filter_size + 1)(text_conv)
             text_conv_blocks.append(text_pool)
         text_concat = concatenate(text_conv_blocks, axis=-1)
@@ -66,30 +72,26 @@ class CNN:
 
     def buildModel(self):
         # Build the model
-        model_CNN = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
+        # model_CNN = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        model_CNN.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        model_CNN.summary()
-
-        return model_CNN
+        # model_CNN.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        # model_CNN.summary()
+        
+        model_SVM = SVC(kernel='linear', probability=True, gamma=0.125)
+        
+        return model_SVM
 
     def trainModel(self):
-        history = self.model.fit(
-            [np.array(self.train_title), np.array(self.train_text)],
-            self.train_rating,
-            epochs=EPOCH,
-            batch_size=BATCH_SIZE,
-            verbose=1,
-            validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
-        )
+        self.model.fit(self.phoBERT_features, self.train_rating)
 
-        self.model.save(PATH + 'CNN.h5')
+        # self.model.save(PATH + 'CNN.h5')
     
     def testModel(self, x_test, y_test):
-        y_pred = self.model.predict(x_test)
-        pred = np.argmax(y_pred,axis=1)
-        report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
+        # y_pred = self.model.predict(x_test)
+        # pred = np.argmax(y_pred,axis=1)
+        # report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
 
-        print(report)
-        with open('classification_report.txt', 'w') as file:
-            file.write(report)
+        # print(report)
+        # with open('classification_report.txt', 'w') as file:
+        #     file.write(report)
+        print(self.model.score())

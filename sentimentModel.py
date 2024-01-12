@@ -14,6 +14,7 @@ from BiLSTM import BiLSTM
 from LSTM import LSTM
 from CNN import CNN
 from Nomarlize import normalizeSentence, statusToNumber
+from phoBERTEmbedding import getPhoBERTFeatures
 
 # Dataset Prepare
 def getData(file_name):
@@ -62,18 +63,7 @@ x_test_title_pad = pad_sequences(x_test_title_sequence, padding='post', maxlen=M
 x_test_text_pad = pad_sequences(x_test_text_sequence, padding='post', maxlen=MAX_LEN)
 
 # GLOVE EMBEDDING IMPLEMENTATION AND USAGE
-glove = Glove.load(PATH + 'gloveModel.model')
-emb_dict = dict()
-word_vectors = glove.word_vectors
-
-for word in list(glove.dictionary.keys()):
-  emb_dict[word] = glove.word_vectors[glove.dictionary[word]]
-
-emb_matrix = np.zeros((vocab_size, EMBEDDING_DIM))
-for word, index in tokenizer.word_index.items():
-  emb_vector = emb_dict.get(word)
-  if emb_vector is not None:
-    emb_matrix[index] = emb_vector
+phoBERT_features = getPhoBERTFeatures()
 
 
 # MODEL IMPLEMENTATION AND TRAINING
@@ -86,30 +76,12 @@ def startLearning():
     x_val_text_pad,
     y_val,
     vocab_size,
-    emb_matrix
+    phoBERT_features
   )
 
   CNN_history = cnn.trainModel()
 
   cnn.testModel(
-    [np.array(x_test_title_pad), np.array(x_test_text_pad)], 
-    np.array(y_test)
-  )
-
-  lstm = LSTM(
-    x_train_title_pad,
-    x_train_text_pad,
-    y_train,
-    x_val_title_pad,
-    x_val_text_pad,
-    y_val,
-    vocab_size,
-    emb_matrix
-  )
-
-  lstm_history = lstm.trainModel()
-
-  lstm.testModel(
     [np.array(x_test_title_pad), np.array(x_test_text_pad)], 
     np.array(y_test)
   )
