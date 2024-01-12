@@ -20,10 +20,9 @@ def getPhoBERTFeatures():
     def getData(file_name):
         file = pd.read_csv(PATH + file_name)
 
-        title = pd.Series([normalizeSentence(sent) for sent in file['title'].apply(str)])
         text = pd.Series([normalizeSentence(sent) for sent in file['text'].apply(str)])
 
-        return pd.concat([title, text])
+        return text
 
     # GET DATA AND STOPWORD
     data = getData('train.csv')
@@ -32,7 +31,7 @@ def getPhoBERTFeatures():
 
     encoder = pd.Series([tokenizer.encode(encode) for encode in data]) # HIGH RISK
 
-    padded = np.array([i + [1] * (MAX_LEN - len(i)) for i in encoder])
+    padded = np.array([np.pad(i, (0, MAX_LEN - len(i)), 'constant', constant_values=(0, 0)) for i in encoder])
     print('padded:', padded[1])
     print('len padded:', padded.shape)
 
