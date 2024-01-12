@@ -31,7 +31,7 @@ def getPhoBERTFeatures():
 
     encoded_sequences = pd.Series([tokenizer.encode(encode, max_length=MAX_LEN, pad_to_max_length=True) for encode in data]) # HIGH RISK
 
-    padded = np.array(encoded_sequences)
+    padded = np.array(encoded_sequences, dtype=object)
     print('padded:', padded[1])
     print('len padded:', padded.shape)
 
