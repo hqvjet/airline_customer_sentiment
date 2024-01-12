@@ -15,11 +15,8 @@ class CNN:
             train_rating,
             val_title,
             val_text,
-            val_rating,
-            vocab_size,
-            phoBERT_features,
+            val_rating
     ):
-        self.vocab_size = vocab_size
         self.title_input = None
         self.text_input = None
         self.train_title = train_title
@@ -28,7 +25,6 @@ class CNN:
         self.val_title = val_title
         self.val_text = val_text
         self.val_rating = val_rating
-        self.phoBERT_features = phoBERT_features
         self.output = self.getOutput() 
         self.model = self.buildModel()
 
@@ -37,7 +33,7 @@ class CNN:
         num_filters = 128
         filter_sizes = [3, 4, 5]
         
-        self.title_input = Input(shape=(self.phoBERT_features.shape[1], self.phoBERT_features.shape[2]))
+        self.title_input = Input(shape=(self.train_title.shape[1],))
         title_conv_blocks = []
         for filter_size in filter_sizes:
             title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(self.title_input)
@@ -47,7 +43,7 @@ class CNN:
         title_flat = Flatten()(title_concat)
 
         # Input for text
-        self.text_input = Input(shape=(self.phoBERT_features.shape[1], self.phoBERT_features.shape[2]))
+        self.text_input = Input(shape=(self.train_text.shape[1],))
         text_conv_blocks = []
         for filter_size in filter_sizes:
             text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(self.text_input)

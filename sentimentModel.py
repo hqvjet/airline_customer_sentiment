@@ -29,59 +29,61 @@ def getData(file_name):
 x_train_title, x_train_text, y_train = getData('train.csv')
 x_test_title, x_test_text, y_test = getData('test.csv')
 
-def tokenize_data(title, text):
-  arr_title = [word_tokenize(sentence, format='text') for sentence in title]
-  arr_text = [word_tokenize(sentence, format='text') for sentence in text]
+# def tokenize_data(title, text):
+#   arr_title = [word_tokenize(sentence, format='text') for sentence in title]
+#   arr_text = [word_tokenize(sentence, format='text') for sentence in text]
 
-  return arr_title, arr_text
+#   return arr_title, arr_text
 
 
-x_train_title, x_train_text = tokenize_data(x_train_title, x_train_text)
+# x_train_title, x_train_text = tokenize_data(x_train_title, x_train_text)
 
-x_train_title, x_val_title, x_train_text, x_val_text, y_train, y_val = train_test_split(x_train_title, x_train_text, y_train, test_size=0.1) 
+# x_train_title, x_val_title, x_train_text, x_val_text, y_train, y_val = train_test_split(x_train_title, x_train_text, y_train, test_size=0.1) 
 
-# Convert to sequences
-tokenizer = Tokenizer()
+# # Convert to sequences
+# tokenizer = Tokenizer()
 
-tokenizer.fit_on_texts([x_train_title, x_train_text])
+# tokenizer.fit_on_texts([x_train_title, x_train_text])
 
-x_train_title_sequence = tokenizer.texts_to_sequences(x_train_title)
-x_train_text_sequence = tokenizer.texts_to_sequences(x_train_text)
-x_val_title_sequence = tokenizer.texts_to_sequences(x_val_title)
-x_val_text_sequence = tokenizer.texts_to_sequences(x_val_text)
-x_test_title_sequence = tokenizer.texts_to_sequences(x_test_title)
-x_test_text_sequence = tokenizer.texts_to_sequences(x_test_text)
+# x_train_title_sequence = tokenizer.texts_to_sequences(x_train_title)
+# x_train_text_sequence = tokenizer.texts_to_sequences(x_train_text)
+# x_val_title_sequence = tokenizer.texts_to_sequences(x_val_title)
+# x_val_text_sequence = tokenizer.texts_to_sequences(x_val_text)
+# x_test_title_sequence = tokenizer.texts_to_sequences(x_test_title)
+# x_test_text_sequence = tokenizer.texts_to_sequences(x_test_text)
 
-# Padding sequences to the same dimensions
-vocab_size = len(tokenizer.word_index) + 1
+# # Padding sequences to the same dimensions
+# vocab_size = len(tokenizer.word_index) + 1
 
-x_train_title_pad = pad_sequences(x_train_title_sequence, padding='post', maxlen=MAX_LEN)
-x_train_text_pad = pad_sequences(x_train_text_sequence, padding='post', maxlen=MAX_LEN)
-x_val_title_pad = pad_sequences(x_val_title_sequence, padding='post', maxlen=MAX_LEN)
-x_val_text_pad = pad_sequences(x_val_text_sequence, padding='post', maxlen=MAX_LEN)
-x_test_title_pad = pad_sequences(x_test_title_sequence, padding='post', maxlen=MAX_LEN)
-x_test_text_pad = pad_sequences(x_test_text_sequence, padding='post', maxlen=MAX_LEN)
+# x_train_title_pad = pad_sequences(x_train_title_sequence, padding='post', maxlen=MAX_LEN)
+# x_train_text_pad = pad_sequences(x_train_text_sequence, padding='post', maxlen=MAX_LEN)
+# x_val_title_pad = pad_sequences(x_val_title_sequence, padding='post', maxlen=MAX_LEN)
+# x_val_text_pad = pad_sequences(x_val_text_sequence, padding='post', maxlen=MAX_LEN)
+# x_test_title_pad = pad_sequences(x_test_title_sequence, padding='post', maxlen=MAX_LEN)
+# x_test_text_pad = pad_sequences(x_test_text_sequence, padding='post', maxlen=MAX_LEN)
 
 # GLOVE EMBEDDING IMPLEMENTATION AND USAGE
-phoBERT_features = getPhoBERTFeatures()
+title_train_feature = getPhoBERTFeatures(x_train_title)
+text_train_feature = getPhoBERTFeatures(x_train_text)
+title_test_feature = getPhoBERTFeatures(x_test_title)
+text_test_feature = getPhoBERTFeatures(x_test_text)
 
+title_train_feature, title_val_feature, text_train_feature, text_val_feature, y_train, y_val = train_test_split(title_train_feature, text_train_feature, y_train, test_size=0.1) 
 
 # MODEL IMPLEMENTATION AND TRAINING
 def startLearning():
   cnn = CNN(
-    x_train_title_pad,
-    x_train_text_pad,
+    title_train_feature,
+    text_train_feature,
     y_train,
-    x_val_title_pad,
-    x_val_text_pad,
+    title_val_feature,
+    text_val_feature,
     y_val,
-    vocab_size,
-    phoBERT_features
   )
 
   CNN_history = cnn.trainModel()
 
   cnn.testModel(
-    [np.array(x_test_title_pad), np.array(x_test_text_pad)], 
+    [np.array(title_test_feature), np.array(text_test_feature)], 
     np.array(y_test)
   )

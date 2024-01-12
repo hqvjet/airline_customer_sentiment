@@ -11,21 +11,22 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from constants import *
 from Nomarlize import normalizeSentence
 
-def getPhoBERTFeatures():
-    tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base")
-    phoBERT = AutoModel.from_pretrained("vinai/phobert-base")
+tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base")
+phoBERT = AutoModel.from_pretrained("vinai/phobert-base")
+
+def getPhoBERTFeatures(data):
 
     # PREPARE DATA
 
-    def getData(file_name):
-        file = pd.read_csv(PATH + file_name)
+    # def getData(file_name):
+    #     file = pd.read_csv(PATH + file_name)
 
-        text = pd.Series([normalizeSentence(sent) for sent in file['text'].apply(str)])
+    #     text = pd.Series([normalizeSentence(sent) for sent in file['text'].apply(str)])
 
-        return text
+    #     return text
 
-    # GET DATA AND STOPWORD
-    data = getData('train.csv')
+    # # GET DATA AND STOPWORD
+    # data = getData('train.csv')
 
     data = pd.Series([word_tokenize(sentence, format='text') for sentence in data])
 
