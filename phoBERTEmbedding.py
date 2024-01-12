@@ -10,8 +10,8 @@ from constants import *
 from Nomarlize import normalizeSentence
 
 def getPhoBERTFeatures():
-    tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-large")
-    phoBERT = AutoModel.from_pretrained("vinai/phobert-large")
+    tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base")
+    phoBERT = AutoModel.from_pretrained("vinai/phobert-base")
 
     # PREPARE DATA
 
@@ -43,8 +43,10 @@ def getPhoBERTFeatures():
     attention_mask = torch.tensor(attention_mask)
 
     # Train model
+    print('TRAINNING PHOBERT MODEL')
     with torch.no_grad():
         last_hidden_states = phoBERT(input_ids=padded, attention_mask=attention_mask)
     #     print('last hidden states:', last_hidden_states)
     features = last_hidden_states[0][:,0,:].numpy()
+    print('PHOBERT MODEL DONE')
     return features
