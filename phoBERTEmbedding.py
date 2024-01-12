@@ -26,7 +26,7 @@ def getPhoBERTFeatures():
     # GET DATA AND STOPWORD
     data = getData('train.csv')
 
-    data = [word_tokenize(sentence, format='text') for sentence in data]
+    data = pd.Series([word_tokenize(sentence, format='text') for sentence in data])
 
     tokenized = data.apply((lambda x: tokenizer.encode(x, add_special_tokens=True))) # HIGH RISK
 
