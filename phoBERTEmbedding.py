@@ -65,7 +65,7 @@ def getDataset(file_name):
 
     # GET LABELS
     label = pd.Series([statusToNumber(status) for status in file['rating'].apply(str)])
-    label = utils.to_categorical(file['rating'] - 1, num_classes=3)
+    label = utils.to_categorical(label - 1, num_classes=3)
 
     # NORMALIZE DATASET
     title = [normalizeSentence(sentence) for sentence in title]
