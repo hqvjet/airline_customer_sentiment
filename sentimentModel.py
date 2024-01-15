@@ -7,7 +7,7 @@ from CNN import CNN
 from phoBERTEmbedding import usingPhoBERT
 
 # Dataset Prepare
-title_train_ids, text_train_ids, train_labels, title_val_ids, text_val_ids, val_labels, title_test_ids, text_test_ids, test_labels = usingPhoBERT()
+title_train_ids, text_train_ids, train_labels, title_val_ids, text_val_ids, val_labels, title_test_ids, text_test_ids, test_labels, vocab_size = usingPhoBERT()
 
 # MODEL IMPLEMENTATION AND TRAINING
 def startLearning():
@@ -18,6 +18,7 @@ def startLearning():
     title_val_ids,
     text_val_ids,
     val_labels,
+    vocab_size
   )
 
   CNN_history = cnn.trainModel()
@@ -26,3 +27,5 @@ def startLearning():
     [np.array(title_test_ids), np.array(text_test_ids)], 
     np.array(test_labels)
   )
+    
+  print('TRAINING DONE.............................')

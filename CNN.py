@@ -15,7 +15,8 @@ class CNN:
             train_rating,
             val_title,
             val_text,
-            val_rating
+            val_rating,
+            vocab_size,
     ):
         self.title_input = None
         self.text_input = None
@@ -25,18 +26,20 @@ class CNN:
         self.val_title = val_title
         self.val_text = val_text
         self.val_rating = val_rating
+        self.vocab_size = vocab_size
         self.output = self.getOutput() 
         self.model = self.buildModel()
 
     def getOutput(self):
         # Input for title
         num_filters = 128
-        filter_sizes = [3, 4, 5]
+        filter_sizes = [2, 3, 4, 5]
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1])(self.title_input)
         title_conv_blocks = []
         for filter_size in filter_sizes:
-            title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(self.title_input)
+            title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(title_embedding)
             title_pool = MaxPooling1D(pool_size=self.train_title.shape[1] - filter_size + 1)(title_conv)
             title_conv_blocks.append(title_pool)
         title_concat = concatenate(title_conv_blocks, axis=-1)
@@ -44,9 +47,10 @@ class CNN:
 
         # Input for text
         self.text_input = Input(shape=(self.train_text.shape[1],))
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1])(self.text_input)
         text_conv_blocks = []
         for filter_size in filter_sizes:
-            text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(self.text_input)
+            text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(text_embedding)
             text_pool = MaxPooling1D(pool_size=self.train_text.shape[1] - filter_size + 1)(text_conv)
             text_conv_blocks.append(text_pool)
         text_concat = concatenate(text_conv_blocks, axis=-1)
