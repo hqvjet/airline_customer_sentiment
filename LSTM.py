@@ -1,6 +1,6 @@
 from keras.models import Model
 from tensorflow.keras.layers import Embedding
-from keras.layers import Input, Embedding, LSTM, Dropout, Dense, concatenate
+from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, concatenate
 from tensorflow.keras import utils
 from sklearn.metrics import classification_report
 import numpy as np
@@ -17,8 +17,7 @@ class LSTM:
         val_title,
         val_text,
         val_rating,
-        vocab_size,
-        embedding_matrix
+        vocab_size
     ):
         self.vocab_size = vocab_size
         self.title_input = None
@@ -29,7 +28,6 @@ class LSTM:
         self.val_title = val_title
         self.val_text = val_text
         self.val_rating = val_rating
-        self.embedding_matrix = embedding_matrix
         self.output = self.getOutput()
         self.model = self.buildModel()
 
@@ -38,17 +36,17 @@ class LSTM:
 
         # Đầu vào cho title
         self.title_input = Input(shape=(self.train_title.shape[1],))
-        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, weights=[self.embedding_matrix], input_length=self.train_title.shape[1], trainable=True)(self.title_input)
-        title_lstm = LSTM(hidden_size, return_sequences=True)(title_embedding)
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1])(self.title_input)
+        title_lstm = LSTM_model(hidden_size, return_sequences=True)(title_embedding)
         title_lstm_dropout = Dropout(0.2)(title_lstm)
-        title_lstm_final = LSTM(hidden_size)(title_lstm_dropout)
+        title_lstm_final = LSTM_model(hidden_size)(title_lstm_dropout)
 
         # Đầu vào cho text
         self.text_input = Input(shape=(self.train_text.shape[1],))
-        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, weights=[self.embedding_matrix], input_length=self.train_text.shape[1], trainable=True)(self.text_input)
-        text_lstm = LSTM(hidden_size, return_sequences=True)(text_embedding)
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1])(self.text_input)
+        text_lstm = LSTM_model(hidden_size, return_sequences=True)(text_embedding)
         text_lstm_dropout = Dropout(0.2)(text_lstm)
-        text_lstm_final = LSTM(hidden_size)(text_lstm_dropout)
+        text_lstm_final = LSTM_model(hidden_size)(text_lstm_dropout)
 
         # Kết hợp hai đầu vào
         combined = concatenate([title_lstm_final, text_lstm_final])
@@ -78,11 +76,11 @@ class LSTM:
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating)
         )
 
-        self.model.save(PATH + 'LSTM.h5')
+        self.model.save(PATH + LSTM_MODEL)
 
     def testModel(self, x_test, y_test):
         y_pred = self.model.predict(x_test)
         pred = np.argmax(y_pred,axis=1)
-        report = classification_report(y_test, utils.to_categorical(pred, num_classes=5))
+        report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
 
         print(report)

@@ -83,13 +83,10 @@ class CNN:
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
         )
 
-        self.model.save(PATH + 'CNN.h5')
+        self.model.save(PATH + CNN_MODEL)
     
     def testModel(self, x_test, y_test):
         y_pred = self.model.predict(x_test)
         pred = np.argmax(y_pred,axis=1)
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
-
         print(report)
-        with open('classification_report.txt', 'w') as file:
-            file.write(report)

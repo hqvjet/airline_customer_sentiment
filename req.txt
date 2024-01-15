@@ -4,5 +4,6 @@ tensorflow
 torch
 transformers
 vncorenlp
-fastBPE
 fairseq
+fastBPE
+keras==2.1.6

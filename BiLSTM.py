@@ -2,7 +2,10 @@ from keras.layers import Input, Bidirectional, LSTM, Dense, GlobalMaxPooling1D
 from keras.models import Model
 from tensorflow.keras.layers import Embedding
 from keras.layers import concatenate
+from sklearn.metrics import classification_report
+from tensorflow.keras import utils
 import numpy as np
+from constants import *
 
 
 class BiLSTM:
@@ -15,15 +18,9 @@ class BiLSTM:
         val_title,
         val_text,
         val_rating,
-        vocab_size,
-        embedding_dim,
-        epoch,
-        batch_size
+        vocab_size
     ):
-        self.embedding_dim = embedding_dim
         self.vocab_size = vocab_size
-        self.epoch = epoch
-        self.batch_size = batch_size
         self.title_input = None
         self.text_input = None
         self.train_title = train_title
@@ -33,6 +30,7 @@ class BiLSTM:
         self.val_text = val_text
         self.val_rating = val_rating
         self.output = self.getOutput()
+        self.model = self.buildModel()
 
     def getOutput(self):
         # Define input layers for the title and text inputs
@@ -40,9 +38,9 @@ class BiLSTM:
         self.text_input = Input(shape=(self.train_text.shape[1],))
 
         # Embedding layer for title
-        title_embedding = Embedding(input_dim=self.vocab_size, output_dim=self.embedding_dim, trainable=True)(self.title_input)
+        title_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, trainable=True)(self.title_input)
         # Embedding layer for text
-        text_embedding = Embedding(input_dim=self.vocab_size, output_dim=self.embedding_dim, trainable=True)(self.text_input)
+        text_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, trainable=True)(self.text_input)
 
         # Bidirectional LSTM layer for title
         title_bilstm = Bidirectional(LSTM(64, return_sequences=True))(title_embedding)
@@ -58,7 +56,7 @@ class BiLSTM:
         concatenated_pooling = concatenate([title_pooling, text_pooling])
 
         # Dense layer for final prediction
-        output_layer = Dense(5, activation='softmax')(concatenated_pooling)
+        output_layer = Dense(3, activation='softmax')(concatenated_pooling)
 
         return output_layer
 
@@ -76,19 +74,21 @@ class BiLSTM:
 
         return model_BiLSTM
 
-    def trainModel(
-        self,
-        model,
-        epoch,
-        batch_size
-    ):
-        history = model.fit(
+    def trainModel(self):
+        history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
-            epochs=epoch,
-            batch_size=batch_size,
+            epochs=EPOCH,
+            batch_size=BATCH_SIZE,
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating)
         )
 
-        return history
+        self.model.save(PATH + BILSTM_MODEL)
+    
+    def testModel(self, x_test, y_test):
+        y_pred = self.model.predict(x_test)
+        pred = np.argmax(y_pred,axis=1)
+        report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
+
+        print(report)
