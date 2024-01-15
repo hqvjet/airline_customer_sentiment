@@ -3,3 +3,6 @@ numpy
 tensorflow
 torch
 transformers
+vncorenlp
+fastBPE
+fairseq
