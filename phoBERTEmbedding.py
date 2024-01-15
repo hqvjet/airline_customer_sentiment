@@ -18,7 +18,7 @@ import pandas as pd
 import torch
 
 from constants import *
-from Nomarlize import normalizeSentence
+from Nomarlize import normalizeSentence, statusToNumber
 
 # LOAD MODEL AND BPE
 parser = argparse.ArgumentParser()
@@ -62,6 +62,9 @@ def getDataset(file_name):
 
     title = file['title'].apply(str)
     text = file['text'].apply(str)
+
+    # GET LABELS
+    label = pd.Series([statusToNumber(status) for status in file['rating'].apply(str)])
     label = utils.to_categorical(file['rating'] - 1, num_classes=3)
 
     # NORMALIZE DATASET
