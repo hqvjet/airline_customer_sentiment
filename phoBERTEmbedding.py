@@ -34,7 +34,7 @@ rdr = VnCoreNLP("vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_siz
 
 # Load the dictionary
 vocab = Dictionary()
-vocab.add_from_file("/content/drive/My Drive/BERT/SA/PhoBERT_base_transformers/dict.txt")
+vocab.add_from_file("PhoBERT_base_transformers/dict.txt")
 
 def getDataIDS(data):
     data_ids = []
