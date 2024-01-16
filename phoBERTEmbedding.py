@@ -22,7 +22,7 @@ from Nomarlize import normalizeSentence, statusToNumber
 # LOAD MODEL AND BPE
 parser = argparse.ArgumentParser()
 parser.add_argument('--bpe-codes', 
-    default=PATH + "PhoBERT_base_transformers/bpe.codes",
+    default=PATH + "PhoBERT_large_transformers/bpe.codes",
     required=False,
     type=str,
     help='path to fastBPE BPE'
@@ -33,7 +33,7 @@ rdr = VnCoreNLP(PATH + "vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_h
 
 # Load the dictionary
 vocab = Dictionary()
-vocab.add_from_file(PATH + "PhoBERT_base_transformers/dict.txt")
+vocab.add_from_file(PATH + "PhoBERT_large_transformers/dict.txt")
 
 def getDataIDS(data):
     data_ids = []
