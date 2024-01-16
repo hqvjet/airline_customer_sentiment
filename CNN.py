@@ -90,3 +90,8 @@ class CNN:
         pred = np.argmax(y_pred,axis=1)
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
         print(report)
+
+        with open(PATH + CNN_REPORT, 'w') as file:
+            print(report, file=file)
+
+        print(f"Classification report saved to {PATH + CNN_REPORT}..................")

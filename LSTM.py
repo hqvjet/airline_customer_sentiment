@@ -84,3 +84,8 @@ class LSTM:
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
 
         print(report)
+
+        with open(PATH + LSTM_REPORT, 'w') as file:
+            print(report, file=file)
+
+        print(f"Classification report saved to {PATH + LSTM_REPORT}...................")

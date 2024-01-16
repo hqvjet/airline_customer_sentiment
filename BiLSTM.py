@@ -92,3 +92,8 @@ class BiLSTM:
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
 
         print(report)
+
+        with open(PATH + BILSTM_REPORT, 'w') as file:
+            print(report, file=file)
+
+        print(f"Classification report saved to {PATH + BILSTM_REPORT}")
