@@ -6,7 +6,6 @@
 # mv VnCoreNLP-1.1.1.jar vncorenlp/ 
 # mv vi-vocab vncorenlp/models/wordsegmenter/
 # mv wordsegmenter.rdr vncorenlp/models/wordsegmenter/
-from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras import utils
@@ -23,18 +22,18 @@ from Nomarlize import normalizeSentence, statusToNumber
 # LOAD MODEL AND BPE
 parser = argparse.ArgumentParser()
 parser.add_argument('--bpe-codes', 
-    default="PhoBERT_base_transformers/bpe.codes",
+    default=PATH + "PhoBERT_base_transformers/bpe.codes",
     required=False,
     type=str,
     help='path to fastBPE BPE'
 )
 args, unknown = parser.parse_known_args()
 bpe = fastBPE(args)
-rdr = VnCoreNLP("vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
+rdr = VnCoreNLP(PATH + "vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
 
 # Load the dictionary
 vocab = Dictionary()
-vocab.add_from_file("PhoBERT_base_transformers/dict.txt")
+vocab.add_from_file(PATH + "PhoBERT_base_transformers/dict.txt")
 
 def getDataIDS(data):
     data_ids = []
@@ -110,3 +109,10 @@ def usingPhoBERT():
     title_test_ids, text_test_ids = prepareData(title_test, text_test)
 
     return title_train_ids, text_train_ids, train_labels, title_val_ids, text_val_ids, val_labels, title_test_ids, text_test_ids, test_labels, len(vocab)
+
+def getIDS(sentence):
+    sentence = normalizeSentence(sentence)
+    sentence = [rdr.tokenize(sentence)]
+    sentence_ids = getDataIDS(sentence)
+
+    return sentence_ids

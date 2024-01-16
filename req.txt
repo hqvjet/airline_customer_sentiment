@@ -6,4 +6,3 @@ transformers
 vncorenlp
 fairseq
 fastBPE
-keras==2.1.6
