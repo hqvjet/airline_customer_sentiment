@@ -38,9 +38,9 @@ class BiLSTM:
         self.text_input = Input(shape=(self.train_text.shape[1],))
 
         # Embedding layer for title
-        title_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, trainable=True)(self.title_input)
+        title_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, trainable=TRAINABLE)(self.title_input)
         # Embedding layer for text
-        text_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, trainable=True)(self.text_input)
+        text_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, trainable=TRAINABLE)(self.text_input)
 
         # Bidirectional LSTM layer for title
         title_bilstm = Bidirectional(LSTM(64, return_sequences=True))(title_embedding)

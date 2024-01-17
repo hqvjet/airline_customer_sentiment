@@ -36,16 +36,16 @@ class LSTM:
 
         # Đầu vào cho title
         self.title_input = Input(shape=(self.train_title.shape[1],))
-        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1])(self.title_input)
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
         title_lstm = LSTM_model(hidden_size, return_sequences=True)(title_embedding)
         title_lstm_dropout = Dropout(0.2)(title_lstm)
         title_lstm_final = LSTM_model(hidden_size)(title_lstm_dropout)
 
         # Đầu vào cho text
         self.text_input = Input(shape=(self.train_text.shape[1],))
-        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1])(self.text_input)
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=TRAINABLE)(self.text_input)
         text_lstm = LSTM_model(hidden_size, return_sequences=True)(text_embedding)
-        text_lstm_dropout = Dropout(0.2)(text_lstm)
+        text_lstm_dropout = Dropout(0.3)(text_lstm)
         text_lstm_final = LSTM_model(hidden_size)(text_lstm_dropout)
 
         # Kết hợp hai đầu vào

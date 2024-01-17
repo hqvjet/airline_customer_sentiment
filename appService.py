@@ -9,6 +9,6 @@ def getRatingFromModel(title, text):
     text_ids = getIDS(text)
 
     y_pred = model.predict([np.array(title_ids), np.array(text_ids)])
-    print(y_pred)
+    # print(y_pred)
 
-    return 1
+    return y_pred

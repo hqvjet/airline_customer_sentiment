@@ -33,10 +33,10 @@ class CNN:
     def getOutput(self):
         # Input for title
         num_filters = 128
-        filter_sizes = [2, 3, 4, 5]
+        filter_sizes = [3, 4, 5, 6, 7]
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
-        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1])(self.title_input)
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
         title_conv_blocks = []
         for filter_size in filter_sizes:
             title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(title_embedding)
@@ -47,7 +47,7 @@ class CNN:
 
         # Input for text
         self.text_input = Input(shape=(self.train_text.shape[1],))
-        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1])(self.text_input)
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=TRAINABLE)(self.text_input)
         text_conv_blocks = []
         for filter_size in filter_sizes:
             text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(text_embedding)
@@ -62,7 +62,7 @@ class CNN:
         # Additional layers of the model
         dense1 = Dense(512, activation='relu')(combined)
 
-        return Dense(self.train_rating.shape[1], activation='softmax')(dense1)
+        return Dense(3, activation='softmax')(dense1)
 
     def buildModel(self):
         # Build the model
