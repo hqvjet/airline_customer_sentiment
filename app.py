@@ -9,4 +9,4 @@ def index():
     rating = getRatingFromModel(req.get('title'), req.get('text'))
     return rating
 
-app.run(debug=True)
+app.run(debug=False)

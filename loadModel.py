@@ -1,5 +1,3 @@
-import sys
-print(sys.path)
 from keras.models import load_model
 from constants import *
 

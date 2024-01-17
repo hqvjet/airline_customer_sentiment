@@ -1,6 +1,4 @@
 from loadModel import getModel
-import sys
-print(sys.path)
 from phoBERTEmbedding import getIDS
 import numpy as np
 
