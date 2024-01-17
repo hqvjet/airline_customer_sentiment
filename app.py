@@ -9,4 +9,4 @@ def index():
     rating = getRatingFromModel(req.get('title'), req.get('text'))
     return rating
 
-app.run(debug=False)
+app.run(host='113.160.235.186', port=5423, debug=False)
