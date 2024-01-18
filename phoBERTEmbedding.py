@@ -114,8 +114,9 @@ def usingPhoBERT():
 def getIDS(sentence):
     sentence = normalizeSentence(sentence)
     sentence = rdr.tokenize(sentence)
+    sentence = sentence[0]
     print(sentence)
-    sentence = ' '.join(sentence)
+    sentence = [' '.join(sentence)]
     sentence_ids = getDataIDS(sentence)
 
     return sentence_ids
