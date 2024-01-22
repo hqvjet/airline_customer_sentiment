@@ -1,0 +1,1 @@
+export const VIETNAM_AIRLINE = './image/vietnam_airlines.jpg'
