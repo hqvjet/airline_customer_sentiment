@@ -4,7 +4,7 @@ export const navbar = [
     {
         name: 'HomePage',
         icon: IoHome,
-        href: '/homepage'
+        href: '/'
     },
     {
         name: 'Feed',
