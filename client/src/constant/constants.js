@@ -17,3 +17,5 @@ export const navbar = [
         href: '/statistic'
     }
 ]
+
+export const IMAGE_PATH = 'resources/images'

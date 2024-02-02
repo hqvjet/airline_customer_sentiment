@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 import httpx
 from database import connect_db
+from airline import rate_airline
 
 
 def generate_id():
@@ -33,7 +34,6 @@ def get_airlines(airline_id):
     cursor.close()
     db.close()
 
-    print(res)
     return jsonify(res)
 
 @comments.post('/submit_comment/<airline_id>')
@@ -63,6 +63,8 @@ async def submit_airlines(airline_id):
         db.commit()
         cursor.close()
         db.close()
+
+        rate_airline(airline_id)
     except:
         return jsonify({'error': 'SQL Error'})
 
