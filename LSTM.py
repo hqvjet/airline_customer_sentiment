@@ -5,6 +5,7 @@ from tensorflow.keras import utils
 from sklearn.metrics import classification_report
 import numpy as np
 from constants import *
+from keras.utils import plot_model
 
 
 class LSTM:
@@ -62,6 +63,8 @@ class LSTM:
 
         model_LSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         model_LSTM.summary()
+        
+        plot_model(model_LSTM, to_file='LSTM.png', show_shapes=True, show_layer_names=True)
 
         return model_LSTM
 

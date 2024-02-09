@@ -1,11 +1,12 @@
 from keras.layers import Input, Bidirectional, LSTM, Dense, GlobalMaxPooling1D
 from keras.models import Model
-from tensorflow.keras.layers import Embedding
+from tensorflow.keras.layers import Embedding, Average, Concatenate
 from keras.layers import concatenate
 from sklearn.metrics import classification_report
 from tensorflow.keras import utils
 import numpy as np
 from constants import *
+from keras.utils import plot_model
 
 
 class BiLSTM:
@@ -53,7 +54,7 @@ class BiLSTM:
         text_pooling = GlobalMaxPooling1D()(text_bilstm)
 
         # Concatenate title and text pooling layers
-        concatenated_pooling = concatenate([title_pooling, text_pooling])
+        concatenated_pooling = Concatenate(axis=1)([title_pooling, text_pooling])
 
         # Dense layer for final prediction
         output_layer = Dense(3, activation='softmax')(concatenated_pooling)
@@ -71,6 +72,8 @@ class BiLSTM:
 
         model_BiLSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         model_BiLSTM.summary()
+
+        plot_model(model_BiLSTM, to_file='BiLSTM.png', show_shapes=True, show_layer_names=True)
 
         return model_BiLSTM
 

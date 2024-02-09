@@ -1,4 +1,4 @@
-import { Row, Col, Typography } from 'antd'
+import { Row, Col, Typography, Card } from 'antd'
 import { Airlines } from '../data/AirLineData'
 import { useEffect, useState } from 'react'
 import usingAirline from '../api/AirlineAPI'
@@ -12,23 +12,35 @@ export default function Feed() {
     useEffect(() => {
         usingAirline.getAirlines(id)
             .then(res => {
-                console.log(res.data)
                 setAirlines(res.data)
             })
             .catch(err => console.log(err))
     }, [])
 
+    const truncateContent = (content) => {
+        if (content.length <= 150) {
+            return content;
+        } else {
+            return content.substring(0, 150) + '...'
+        }
+    }
+
     return (
         <Row className='mx-10'>
             <Row justify={'center'} className='w-full my-10'>
-                <Title>AILRINE FILTER</Title>
+                <Title>AIRLINE FILTER</Title>
             </Row>
-            <Row gutter={[16, 24]}>
+            <Row className='w-full'>
                 {airlines.map(airline => (
-                    <Col key={airline.id} span={8} className='gutter-row'>
-                        <Row className='shadow p-10' justify={'center'}>
-                            <a href={`/airline/detail/${airline.id}`}>{airline.name}</a>
-                        </Row>
+                    <Col key={airline.id} md={7} className='m-5'>
+                        <Card>
+                            <Row className='' justify={'center'}>
+                                <Title className='text-black'><a href={`/airline/detail/${airline.id}`}>{airline.name}</a></Title>
+                            </Row>
+                            <Text>
+                                {truncateContent(airline.about)}
+                            </Text>
+                        </Card>
                     </Col>
                 ))}
             </Row>

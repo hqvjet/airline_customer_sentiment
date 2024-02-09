@@ -90,18 +90,18 @@ def getDataset(file_name):
     print('READING DATASET FROM FILE................................')
     file = pd.read_csv(PATH + file_name)
 
-    title = file['title'].apply(str)
-    text = file['text'].apply(str)
+    title = file['Title'].apply(str)
+    text = file['Content'].apply(str)
 
     # GET LABELS
-    label = pd.Series([statusToNumber(status) for status in file['rating'].apply(str)])
+    label = pd.Series([status for status in file['Rating'].apply(int)])
     label = utils.to_categorical(label - 1, num_classes=3)
 
-    return title, text, label
+    return train_test_split(title, text, label, test_size=0.1)
 
 def usingPhoBERT():
-    title_train, text_train, train_labels = getDataset('train.csv')
-    title_test, text_test, test_labels = getDataset('test.csv')
+    
+    title_train, title_test, text_train, text_test, train_labels, test_labels = getDataset('data.csv')
 
     title_train, title_val, text_train, text_val, train_labels, val_labels = train_test_split(title_train, text_train, train_labels, test_size=0.1)
 
