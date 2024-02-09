@@ -41,7 +41,8 @@ class CNN:
         title_conv_blocks = []
         for filter_size in filter_sizes:
             title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(title_embedding)
-            title_pool = GlobalMaxPooling1D(pool_size=self.train_title.shape[1] - filter_size + 1)(title_conv)
+            # title_pool = MaxPooling1D(pool_size=self.train_title.shape[1] - filter_size + 1)(title_conv)
+            title_pool = GlobalMaxPooling1D()(title_conv)
             title_conv_blocks.append(title_pool)
         title_concat = concatenate(title_conv_blocks, axis=-1)
         title_flat = Flatten()(title_concat)
@@ -53,7 +54,8 @@ class CNN:
         text_conv_blocks = []
         for filter_size in filter_sizes:
             text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(text_embedding)
-            text_pool = GlobalMaxPooling1D(pool_size=self.train_text.shape[1] - filter_size + 1)(text_conv)
+            # text_pool = MaxPooling1D(pool_size=self.train_text.shape[1] - filter_size + 1)(text_conv)
+            text_pool = GlobalMaxPooling1D()(text_conv)
             text_conv_blocks.append(text_pool)
         text_concat = concatenate(text_conv_blocks, axis=-1)
         text_flat = Flatten()(text_concat)
