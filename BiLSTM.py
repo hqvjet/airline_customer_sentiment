@@ -55,7 +55,7 @@ class BiLSTM:
         text_pooling = GlobalMaxPooling1D()(text_bilstm)
 
         # Concatenate title and text pooling layers
-        concatenated_pooling = Average(axis=1)([title_pooling, text_pooling])
+        concatenated_pooling = Average()([title_pooling, text_pooling])
 
         # Dense layer for final prediction
         output_layer = Dense(3, activation='softmax')(concatenated_pooling)
