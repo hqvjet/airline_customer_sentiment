@@ -49,7 +49,7 @@ class LSTM:
         text_lstm_dropout = Dropout(DROP)(text_lstm)
 
         # Kết hợp hai đầu vào
-        combined = Average([title_lstm_dropout, text_lstm_dropout])
+        combined = Average()([title_lstm_dropout, text_lstm_dropout])
 
         # Các bước còn lại của mô hình
         dense1 = Dense(512, activation='relu')(combined)
