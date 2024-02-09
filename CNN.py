@@ -37,9 +37,10 @@ class CNN:
         DROP = 0.3
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
         title_conv_blocks = []
         for filter_size in filter_sizes:
-            title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(self.title_input)
+            title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(title_embedding)
             title_pool = GlobalMaxPooling1D(pool_size=self.train_title.shape[1] - filter_size + 1)(title_conv)
             title_conv_blocks.append(title_pool)
         title_concat = concatenate(title_conv_blocks, axis=-1)
@@ -48,9 +49,10 @@ class CNN:
 
         # Input for text
         self.text_input = Input(shape=(self.train_text.shape[1],))
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=TRAINABLE)(self.text_input)
         text_conv_blocks = []
         for filter_size in filter_sizes:
-            text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(self.text_input)
+            text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(text_embedding)
             text_pool = GlobalMaxPooling1D(pool_size=self.train_text.shape[1] - filter_size + 1)(text_conv)
             text_conv_blocks.append(text_pool)
         text_concat = concatenate(text_conv_blocks, axis=-1)
@@ -58,7 +60,7 @@ class CNN:
         text_drop = Dropout(DROP)(text_flat)
 
         # Average two inputs
-        average = Average()([title_flat, text_flat])
+        average = Average()([title_drop, text_drop])
 
         # Additional layers of the model
         dense1 = Dense(512, activation='relu')(average)
