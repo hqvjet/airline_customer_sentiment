@@ -1,6 +1,6 @@
 from keras.models import Model
 from tensorflow.keras.layers import Embedding
-from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, concatenate
+from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, concatenate, Average
 from tensorflow.keras import utils
 from sklearn.metrics import classification_report
 import numpy as np
@@ -34,23 +34,22 @@ class LSTM:
 
     def getOutput(self):
         hidden_size = 512
+        DROP = 0.3
 
         # Đầu vào cho title
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
         title_lstm = LSTM_model(hidden_size, return_sequences=True)(title_embedding)
-        title_lstm_dropout = Dropout(0.4)(title_lstm)
-        title_lstm_final = LSTM_model(hidden_size)(title_lstm_dropout)
+        title_lstm_dropout = Dropout(DROP)(title_lstm)
 
         # Đầu vào cho text
         self.text_input = Input(shape=(self.train_text.shape[1],))
         text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=TRAINABLE)(self.text_input)
         text_lstm = LSTM_model(hidden_size, return_sequences=True)(text_embedding)
-        text_lstm_dropout = Dropout(0.4)(text_lstm)
-        text_lstm_final = LSTM_model(hidden_size)(text_lstm_dropout)
+        text_lstm_dropout = Dropout(DROP)(text_lstm)
 
         # Kết hợp hai đầu vào
-        combined = concatenate([title_lstm_final, text_lstm_final])
+        combined = Average([title_lstm_dropout, text_lstm_dropout])
 
         # Các bước còn lại của mô hình
         dense1 = Dense(512, activation='relu')(combined)

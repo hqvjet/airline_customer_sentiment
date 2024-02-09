@@ -1,6 +1,6 @@
 PATH = 'resources/'
 MAX_LEN = 200
-EPOCH = 1
+EPOCH = 5
 BATCH_SIZE = 4
 EMBEDDING_DIM = 512
 
