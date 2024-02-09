@@ -1,12 +1,13 @@
-from keras.layers import Input, Embedding, Conv1D, MaxPooling1D, Flatten, Dense, concatenate
+from keras.layers import Input, Embedding, Conv1D, MaxPooling1D, Flatten, Dense, concatenate, Average
 from keras.models import Model
 import numpy as np
 from sklearn.metrics import classification_report
 from constants import *
 from tensorflow.keras import utils
+import matplotlib.pyplot as plt
 
 
-class CNN:
+class CNN_BILSTM:
 
     def __init__(
             self,
@@ -17,6 +18,8 @@ class CNN:
             val_text,
             val_rating,
             vocab_size,
+            cnn_model,
+            bilstm_mode
     ):
         self.title_input = None
         self.text_input = None
@@ -27,6 +30,8 @@ class CNN:
         self.val_text = val_text
         self.val_rating = val_rating
         self.vocab_size = vocab_size
+        self.cnn_model = cnn_model
+        self.bilstm_model = bilstm_mode
         self.output = self.getOutput() 
         self.model = self.buildModel()
 
@@ -36,28 +41,28 @@ class CNN:
       self.text_input = Input(shape=(self.train_text.shape[1],))
 
       # Get the predictions from the BiLSTM model
-      lstm_predictions = model_BiLSTM([self.title_input, self.text_input])
+      lstm_predictions = self.bilstm_model([self.title_input, self.text_input])
 
       # Get the predictions from the CNN model
-      cnn_predictions = model_CNN([self.title_input, self.text_input])
+      cnn_predictions = self.cnn_model([self.title_input, self.text_input])
 
-      # Concatenate the predictions
-      concatenated_predictions = Concatenate()([lstm_predictions, cnn_predictions])
+      # Average predictions
+      average_predictions = Average()([lstm_predictions, cnn_predictions])
 
       # Add a dense layer
-      dense_layer = Dense(64, activation='relu')(concatenated_predictions)
+      dense_layer = Dense(EMBEDDING_DIM, activation='relu')(average_predictions)
 
       # Add another dense layer for the final output
-      output_layer = Dense(5, activation='softmax')(dense_layer)
+      return Dense(3, activation='softmax')(dense_layer)
 
     def buildModel(self):
         # Build the model
-        model_CNN = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
+        cnn_bilstm_model = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        model_CNN.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        model_CNN.summary()
+        cnn_bilstm_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        cnn_bilstm_model.summary()
 
-        return model_CNN
+        return cnn_bilstm_model
 
     def trainModel(self):
         history = self.model.fit(
@@ -69,7 +74,17 @@ class CNN:
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
         )
 
-        self.model.save(PATH + CNN_MODEL)
+        self.model.save(PATH + CNN_BILSTM_MODEL)
+
+        # Plot training accuracy and loss values in the same plot
+        plt.plot(history.history['accuracy'], label='Train Accuracy')
+        plt.plot(history.history['loss'], label='Train Loss')
+        plt.title('Model Train Accuracy and Loss')
+        plt.ylabel('Value')
+        plt.xlabel('Epoch')
+        plt.legend()
+        plt.savefig(PATH + 'BiLSTM_chart.png')  # Lưu biểu đồ vào file
+        # plt.show()
     
     def testModel(self, x_test, y_test):
         y_pred = self.model.predict(x_test)
@@ -81,26 +96,3 @@ class CNN:
             print(report, file=file)
 
         print(f"Classification report saved to {PATH + CNN_REPORT}..................")
-
-
-def build_ensemble_model(model_BiLSTM, model_CNN):
-    
-
-    ensemble_model = Model(inputs=[title_input, text_input], outputs=output_layer)
-
-    return ensemble_model
-
-
-# Build the ensemble model
-model_ensemble_bilstm_cnn = build_ensemble_model(model_BiLSTM, model_CNN)
-model_ensemble_bilstm_cnn.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-model_ensemble_bilstm_cnn.summary()
-
-history = model_ensemble_bilstm_cnn.fit(
-    [np.array(x_train_title_pad), np.array(x_train_text_pad)],
-    y_train,
-    epochs=EPOCH,
-    batch_size=4,
-    verbose=1,
-    validation_data=([np.array(x_test_title_pad), np.array(x_test_text_pad)], y_test)
-)

@@ -55,10 +55,10 @@ class BiLSTM:
         text_pooling = GlobalMaxPooling1D()(text_bilstm)
 
         # Concatenate title and text pooling layers
-        concatenated_pooling = Average()([title_pooling, text_pooling])
+        average_pooling = Average()([title_pooling, text_pooling])
 
         # Dense layer for final prediction
-        output_layer = Dense(3, activation='softmax')(concatenated_pooling)
+        output_layer = Dense(3, activation='softmax')(average_pooling)
 
         return output_layer
 
@@ -99,6 +99,8 @@ class BiLSTM:
         plt.legend()
         plt.savefig(PATH + 'BiLSTM_chart.png')  # Lưu biểu đồ vào file
         # plt.show()
+
+        return self.model
     
     def testModel(self, x_test, y_test):
         y_pred = self.model.predict(x_test)

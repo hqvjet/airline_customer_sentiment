@@ -5,6 +5,7 @@ from sklearn.metrics import classification_report
 from constants import *
 from tensorflow.keras import utils
 from keras.utils import plot_model
+import matplotlib.pyplot as plt
 
 class CNN:
 
@@ -91,6 +92,18 @@ class CNN:
         )
 
         self.model.save(PATH + CNN_MODEL)
+
+        # Plot training accuracy and loss values in the same plot
+        plt.plot(history.history['accuracy'], label='Train Accuracy')
+        plt.plot(history.history['loss'], label='Train Loss')
+        plt.title('Model Train Accuracy and Loss')
+        plt.ylabel('Value')
+        plt.xlabel('Epoch')
+        plt.legend()
+        plt.savefig(PATH + 'BiLSTM_chart.png')  # Lưu biểu đồ vào file
+        # plt.show()
+
+        return self.model
     
     def testModel(self, x_test, y_test):
         y_pred = self.model.predict(x_test)
