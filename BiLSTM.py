@@ -7,6 +7,7 @@ from tensorflow.keras import utils
 import numpy as np
 from constants import *
 from keras.utils import plot_model
+import matplotlib.pyplot as plt
 
 
 class BiLSTM:
@@ -44,9 +45,9 @@ class BiLSTM:
         text_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, trainable=TRAINABLE)(self.text_input)
 
         # Bidirectional LSTM layer for title
-        title_bilstm = Bidirectional(LSTM(64, return_sequences=True))(title_embedding)
+        title_bilstm = Bidirectional(LSTM(EMBEDDING_DIM, return_sequences=True))(title_embedding)
         # Bidirectional LSTM layer for text
-        text_bilstm = Bidirectional(LSTM(64, return_sequences=True))(text_embedding)
+        text_bilstm = Bidirectional(LSTM(EMBEDDING_DIM, return_sequences=True))(text_embedding)
 
         # Global Max Pooling layer for title
         title_pooling = GlobalMaxPooling1D()(title_bilstm)
@@ -54,7 +55,7 @@ class BiLSTM:
         text_pooling = GlobalMaxPooling1D()(text_bilstm)
 
         # Concatenate title and text pooling layers
-        concatenated_pooling = Concatenate(axis=1)([title_pooling, text_pooling])
+        concatenated_pooling = Average(axis=1)([title_pooling, text_pooling])
 
         # Dense layer for final prediction
         output_layer = Dense(3, activation='softmax')(concatenated_pooling)
@@ -88,6 +89,16 @@ class BiLSTM:
         )
 
         self.model.save(PATH + BILSTM_MODEL)
+
+        # Plot training accuracy and loss values in the same plot
+        plt.plot(history.history['accuracy'], label='Train Accuracy')
+        plt.plot(history.history['loss'], label='Train Loss')
+        plt.title('Model Train Accuracy and Loss')
+        plt.ylabel('Value')
+        plt.xlabel('Epoch')
+        plt.legend()
+        plt.savefig(PATH + 'BiLSTM_chart.png')  # Lưu biểu đồ vào file
+        # plt.show()
     
     def testModel(self, x_test, y_test):
         y_pred = self.model.predict(x_test)
