@@ -48,10 +48,9 @@ class CNN:
 
         # Input for text
         self.text_input = Input(shape=(self.train_text.shape[1],))
-        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=TRAINABLE)(self.text_input)
         text_conv_blocks = []
         for filter_size in filter_sizes:
-            text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(text_embedding)
+            text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(self.text_input)
             text_pool = GlobalMaxPooling1D(pool_size=self.train_text.shape[1] - filter_size + 1)(text_conv)
             text_conv_blocks.append(text_pool)
         text_concat = concatenate(text_conv_blocks, axis=-1)

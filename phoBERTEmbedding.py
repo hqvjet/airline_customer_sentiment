@@ -37,7 +37,6 @@ vocab.add_from_file(PATH + "PhoBERT_large_transformers/dict.txt")
 
 def getDataIDS(data):
     data_ids = []
-    print(data)
     for sentence in data:
         words = '<s>' + bpe.encode(sentence) + '</s>'
         encoded_setence = vocab.encode_line(words, append_eos=True, add_if_not_exist=False).long().tolist()
