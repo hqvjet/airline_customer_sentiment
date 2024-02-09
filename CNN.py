@@ -96,11 +96,11 @@ class CNN:
         # Plot training accuracy and loss values in the same plot
         plt.plot(history.history['accuracy'], label='Train Accuracy')
         plt.plot(history.history['loss'], label='Train Loss')
-        plt.title('Model Train Accuracy and Loss')
+        plt.title('CNN Model')
         plt.ylabel('Value')
         plt.xlabel('Epoch')
         plt.legend()
-        plt.savefig(PATH + 'BiLSTM_chart.png')  # Lưu biểu đồ vào file
+        plt.savefig(PATH + 'CNN_chart.png')  # Lưu biểu đồ vào file
         # plt.show()
 
         return self.model

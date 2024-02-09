@@ -93,7 +93,7 @@ class BiLSTM:
         # Plot training accuracy and loss values in the same plot
         plt.plot(history.history['accuracy'], label='Train Accuracy')
         plt.plot(history.history['loss'], label='Train Loss')
-        plt.title('Model Train Accuracy and Loss')
+        plt.title('BiLSTM Model')
         plt.ylabel('Value')
         plt.xlabel('Epoch')
         plt.legend()

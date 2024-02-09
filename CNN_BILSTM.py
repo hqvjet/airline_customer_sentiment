@@ -79,11 +79,11 @@ class CNN_BILSTM:
         # Plot training accuracy and loss values in the same plot
         plt.plot(history.history['accuracy'], label='Train Accuracy')
         plt.plot(history.history['loss'], label='Train Loss')
-        plt.title('Model Train Accuracy and Loss')
+        plt.title('CNN + BiLSTM Model')
         plt.ylabel('Value')
         plt.xlabel('Epoch')
         plt.legend()
-        plt.savefig(PATH + 'BiLSTM_chart.png')  # Lưu biểu đồ vào file
+        plt.savefig(PATH + 'CNN_BiLSTM_chart.png')  # Lưu biểu đồ vào file
         # plt.show()
     
     def testModel(self, x_test, y_test):
