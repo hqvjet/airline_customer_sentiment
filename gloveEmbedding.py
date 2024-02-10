@@ -12,6 +12,7 @@ from Nomarlize import normalizeSentence
 
 
 def getEmbeddingMatrix(tokenizer, vocab_size):
+  print('LOADING GLOVE MODEL......................................')
   glove_model = Glove.load(PATH + 'gloveModel.model')
   emb_dict = dict()
 
@@ -31,7 +32,6 @@ def getDataIDS(sentences, tokenizer):
   return pad_sequences(ids, padding='post', maxlen=MAX_LEN)
 
 def tokenizeData(title, text):
-  print('LOADING GLOVE MODEL......................................')
   # NORMALIZE DATASET
   title = [normalizeSentence(sentence) for sentence in title]
   text = [normalizeSentence(sentence) for sentence in text]
