@@ -28,7 +28,7 @@ def getDataIDS(sentences, tokenizer):
   ids = tokenizer.texts_to_sequences(sentences)
   return pad_sequences(ids, padding='post', maxlen=MAX_LEN)
 
-def prepareData(title, text, tokenizer):
+def tokenizeData(title, text):
   print('LOADING GLOVE MODEL......................................')
   # NORMALIZE DATASET
   title = [normalizeSentence(sentence) for sentence in title]
@@ -39,6 +39,9 @@ def prepareData(title, text, tokenizer):
   title = [word_tokenize(sentence, format='text') for sentence in title]
   text = [word_tokenize(sentence, format='text') for sentence in text]
 
+  return title, text
+
+def prepareData(title, text, tokenizer):
   # MAPPING TO VOCAB
   print('MAPPING AND PADDING DATASET..............................')
   title_ids = getDataIDS(title, tokenizer)
@@ -65,8 +68,12 @@ def usingGlove():
 
   title_train, title_val, text_train, text_val, train_labels, val_labels = train_test_split(title_train, text_train, train_labels, test_size=0.1)
 
+  title_train, text_train = tokenizeData(title_train, text_train)
+  title_test, text_test = tokenizeData(title_test, text_test)
+  title_val, text_val = tokenizeData(title_val, text_val)
+
   tokenizer = Tokenizer()
-  tokenizer.fit_on_texts([title_train, title_val, text_train, text_val])
+  tokenizer.fit_on_texts([title_train, title_val, text_train, text_val, title_test, text_test])
 
   title_train_ids, text_train_ids = prepareData(title_train, text_train, tokenizer)
   title_val_ids, text_val_ids = prepareData(title_val, text_val, tokenizer)
