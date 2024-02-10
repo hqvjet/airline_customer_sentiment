@@ -100,7 +100,7 @@ class BiLSTM:
         plt.ylabel('Value')
         plt.xlabel('Epoch')
         plt.legend()
-        plt.savefig(PATH + 'BiLSTM_chart.png')  # Lưu biểu đồ vào file
+        plt.savefig(PATH + 'BiLSTM_chart_GLOVE.png')  # Lưu biểu đồ vào file
         plt.close()
 
         return self.model
