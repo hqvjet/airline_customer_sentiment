@@ -1,89 +1,88 @@
-from glove import Glove
-import pandas as pd
 import numpy as np
-import re
-from underthesea import word_tokenize
-from tensorflow.keras import utils
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras import utils
-from sklearn.model_selection import train_test_split
 
 from constants import *
 from BiLSTM import BiLSTM
 from LSTM import LSTM
 from CNN import CNN
-from Nomarlize import normalizeSentence, statusToNumber
-from phoBERTEmbedding import getPhoBERTFeatures
+from gloveEmbedding import usingGlove, getEmbeddingMatrix
+from CNN_BILSTM import CNN_BILSTM
 
 # Dataset Prepare
-def getData(file_name):
-  file = pd.read_csv(PATH + file_name)
-
-  title = pd.Series([normalizeSentence(sent) for sent in file['title'].apply(str)])
-  text = pd.Series([normalizeSentence(sent) for sent in file['text'].apply(str)])
-  rating = pd.Series([statusToNumber(sent) for sent in file['rating'].apply(str)])
-
-  return title, text, utils.to_categorical(rating - 1, num_classes=3)
-
-x_train_title, x_train_text, y_train = getData('train.csv')
-x_test_title, x_test_text, y_test = getData('test.csv')
-
-# def tokenize_data(title, text):
-#   arr_title = [word_tokenize(sentence, format='text') for sentence in title]
-#   arr_text = [word_tokenize(sentence, format='text') for sentence in text]
-
-#   return arr_title, arr_text
-
-
-# x_train_title, x_train_text = tokenize_data(x_train_title, x_train_text)
-
-# x_train_title, x_val_title, x_train_text, x_val_text, y_train, y_val = train_test_split(x_train_title, x_train_text, y_train, test_size=0.1) 
-
-# # Convert to sequences
-# tokenizer = Tokenizer()
-
-# tokenizer.fit_on_texts([x_train_title, x_train_text])
-
-# x_train_title_sequence = tokenizer.texts_to_sequences(x_train_title)
-# x_train_text_sequence = tokenizer.texts_to_sequences(x_train_text)
-# x_val_title_sequence = tokenizer.texts_to_sequences(x_val_title)
-# x_val_text_sequence = tokenizer.texts_to_sequences(x_val_text)
-# x_test_title_sequence = tokenizer.texts_to_sequences(x_test_title)
-# x_test_text_sequence = tokenizer.texts_to_sequences(x_test_text)
-
-# # Padding sequences to the same dimensions
-# vocab_size = len(tokenizer.word_index) + 1
-
-# x_train_title_pad = pad_sequences(x_train_title_sequence, padding='post', maxlen=MAX_LEN)
-# x_train_text_pad = pad_sequences(x_train_text_sequence, padding='post', maxlen=MAX_LEN)
-# x_val_title_pad = pad_sequences(x_val_title_sequence, padding='post', maxlen=MAX_LEN)
-# x_val_text_pad = pad_sequences(x_val_text_sequence, padding='post', maxlen=MAX_LEN)
-# x_test_title_pad = pad_sequences(x_test_title_sequence, padding='post', maxlen=MAX_LEN)
-# x_test_text_pad = pad_sequences(x_test_text_sequence, padding='post', maxlen=MAX_LEN)
-
-# GLOVE EMBEDDING IMPLEMENTATION AND USAGE
-title_train_feature = getPhoBERTFeatures(x_train_title)
-text_train_feature = getPhoBERTFeatures(x_train_text)
-title_test_feature = getPhoBERTFeatures(x_test_title)
-text_test_feature = getPhoBERTFeatures(x_test_text)
-
-title_train_feature, title_val_feature, text_train_feature, text_val_feature, y_train, y_val = train_test_split(title_train_feature, text_train_feature, y_train, test_size=0.1) 
+title_train_ids, text_train_ids, train_labels, title_val_ids, text_val_ids, val_labels, title_test_ids, text_test_ids, test_labels, tokenizer = usingGlove()
+vocab_size = len(tokenizer.word_index) + 1
+emb_mat = getEmbeddingMatrix(tokenizer, vocab_size)
 
 # MODEL IMPLEMENTATION AND TRAINING
 def startLearning():
+  print('TRAINING USING CNN MODEL.......................')
   cnn = CNN(
-    title_train_feature,
-    text_train_feature,
-    y_train,
-    title_val_feature,
-    text_val_feature,
-    y_val,
+    title_train_ids,
+    text_train_ids,
+    train_labels,
+    title_val_ids,
+    text_val_ids,
+    val_labels,
+    vocab_size,
+    emb_mat
   )
 
-  CNN_history = cnn.trainModel()
-
+  cnn_model = cnn.trainModel()
   cnn.testModel(
-    [np.array(title_test_feature), np.array(text_test_feature)], 
-    np.array(y_test)
+    [np.array(title_test_ids), np.array(text_test_ids)], 
+    np.array(test_labels)
   )
+  
+  print('TRAINING USING BiLSTM MODEL......................')
+  bilstm = BiLSTM(
+    title_train_ids,
+    text_train_ids,
+    train_labels,
+    title_val_ids,
+    text_val_ids,
+    val_labels,
+    vocab_size,
+    emb_mat
+  )
+
+  bilstm_model = bilstm.trainModel()
+  bilstm.testModel(
+    [np.array(title_test_ids), np.array(text_test_ids)], 
+    np.array(test_labels)
+  )
+  
+  print('TRAINING USING CNN + BiLSTM MODEL.................')
+  cnn_bilstm = CNN_BILSTM(
+    title_train_ids,
+    text_train_ids,
+    train_labels,
+    title_val_ids,
+    text_val_ids,
+    val_labels,
+    vocab_size,
+    cnn_model,
+    bilstm_model
+  )
+
+  cnn_bilstm.trainModel()
+  cnn_bilstm.testModel(
+    [np.array(title_test_ids), np.array(text_test_ids)], 
+    np.array(test_labels)
+  )
+
+  # print('TRAINING USING LSTM MODEL.........................')
+  # lstm = LSTM(
+  #   title_train_ids,
+  #   text_train_ids,
+  #   train_labels,
+  #   title_val_ids,
+  #   text_val_ids,
+  #   val_labels,
+  #   vocab_size
+  # )
+
+  # lstm.trainModel()
+  # lstm.testModel(
+  #   [np.array(title_test_ids), np.array(text_test_ids)], 
+  #   np.array(test_labels)
+  # )
+  print('TRAINING DONE.............................')
