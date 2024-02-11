@@ -13,7 +13,7 @@ from Nomarlize import normalizeSentence
 
 def getEmbeddingMatrix(tokenizer, vocab_size):
   print('LOADING GLOVE MODEL......................................')
-  glove_model = Glove.load(PATH + 'gloveModel.model')
+  glove_model = Glove.load(PATH + 'gloveModel300.model')
   emb_dict = dict()
 
   for word in list(glove_model.dictionary.keys()):
