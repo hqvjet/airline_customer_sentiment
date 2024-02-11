@@ -95,14 +95,14 @@ def trainGlove():
 
   # Training GLOVE model
 
-  EMBEDDING_DIM = 512
+  EMBEDDING_DIM = 200
   LEARNING_RATE = 0.01
 
   corpus = Corpus()
   corpus.fit(data, window=15)
 
   glove = Glove(no_components=EMBEDDING_DIM, learning_rate=LEARNING_RATE)
-  glove.fit(corpus.matrix, epochs=100, no_threads=8, verbose=True)
+  glove.fit(corpus.matrix, epochs=300, no_threads=8, verbose=True)
   glove.add_dictionary(corpus.dictionary)
 
-  glove.save(PATH + 'gloveModel.model')
+  glove.save(PATH + 'gloveModel300.model')
