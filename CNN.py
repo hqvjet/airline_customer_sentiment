@@ -79,7 +79,7 @@ class CNN:
         model_CNN.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         model_CNN.summary()
         
-        plot_model(model_CNN, to_file='CNN.png', show_shapes=True, show_layer_names=True)
+        plot_model(model_CNN, to_file=PATH + MODEL_IMAGE + CNN_IMAGE, show_shapes=True, show_layer_names=True)
 
         return model_CNN
 
@@ -93,9 +93,8 @@ class CNN:
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
         )
 
-        self.model.save(PATH + CNN_MODEL)
+        self.model.save(PATH + MODEL + CNN_MODEL)
 
-        # Plot training accuracy and loss values in the same plot
         plt.figure()
         plt.plot(history.history['accuracy'], label='Train Accuracy')
         plt.plot(history.history['loss'], label='Train Loss')
@@ -103,7 +102,7 @@ class CNN:
         plt.ylabel('Value')
         plt.xlabel('Epoch')
         plt.legend()
-        plt.savefig(PATH + 'CNN_chart_GLOVE.png')  # Lưu biểu đồ vào file
+        plt.savefig(PATH + CHART + CNN_CHART)
         plt.close()
 
         return self.model
@@ -114,7 +113,7 @@ class CNN:
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
         print(report)
 
-        with open(PATH + CNN_REPORT, 'w') as file:
+        with open(PATH + REPORT + CNN_REPORT, 'w') as file:
             print(report, file=file)
 
-        print(f"Classification report saved to {PATH + CNN_REPORT}..................")
+        print(f"Classification report saved to {PATH + REPORT + CNN_REPORT}..................")

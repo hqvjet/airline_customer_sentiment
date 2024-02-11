@@ -64,11 +64,6 @@ class BiLSTM:
 
         return output_layer
 
-        # # Create model
-        # model = Model(inputs=[title_input, text_input], outputs=output_layer)
-
-        # return model
-
     def buildModel(self):
         # Build the model
         model_BiLSTM = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
@@ -76,7 +71,7 @@ class BiLSTM:
         model_BiLSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         model_BiLSTM.summary()
 
-        plot_model(model_BiLSTM, to_file='BiLSTM.png', show_shapes=True, show_layer_names=True)
+        plot_model(model_BiLSTM, to_file=PATH + MODEL_IMAGE + BILSTM_IMAGE, show_shapes=True, show_layer_names=True)
 
         return model_BiLSTM
 
@@ -90,7 +85,7 @@ class BiLSTM:
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating)
         )
 
-        self.model.save(PATH + BILSTM_MODEL)
+        self.model.save(PATH + MODEL + BILSTM_MODEL)
 
         # Plot training accuracy and loss values in the same plot
         plt.figure()
@@ -100,7 +95,7 @@ class BiLSTM:
         plt.ylabel('Value')
         plt.xlabel('Epoch')
         plt.legend()
-        plt.savefig(PATH + 'BiLSTM_chart_GLOVE.png')  # Lưu biểu đồ vào file
+        plt.savefig(PATH + CHART + BILSTM_CHART)  # Lưu biểu đồ vào file
         plt.close()
 
         return self.model
@@ -112,7 +107,7 @@ class BiLSTM:
 
         print(report)
 
-        with open(PATH + BILSTM_REPORT, 'w') as file:
+        with open(PATH + REPORT + BILSTM_REPORT, 'w') as file:
             print(report, file=file)
 
-        print(f"Classification report saved to {PATH + BILSTM_REPORT}")
+        print(f"Classification report saved to {PATH + REPORT + BILSTM_REPORT}")

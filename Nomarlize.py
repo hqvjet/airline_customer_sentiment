@@ -1,16 +1,9 @@
 import re
 from constants import PATH
 import pandas as pd
-# from underthesea import sent_tokenize
 
-# def getStopWord(file_name):
-#     file = pd.read_csv(PATH + file_name)
-#     sw = pd.Series(word for word in file['text']).apply(str)
-    
-#     return sw
-
-# stopWord = getStopWord('stopword.csv')
-
+stopword = pd.read_csv(PATH + 'stopword.csv')
+stopword = [word for word in stopword['stopword']]
 
 def normalizeSentence(sentence):
     RE_EMOJI = re.compile(u'([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF])')
@@ -19,6 +12,10 @@ def normalizeSentence(sentence):
     sentence = re.sub(r'\b(?:[1-5]\.\d+|[1-5])\b|\b\d+(\.\d+)?(l|ml|cm|m|mm|km|tr|k)\b', '', sentence)
     sentence = re.sub(r'[^\w\s]', '', sentence)
     sentence = re.sub(r'\b\d+\b', '', sentence)
+
+    for word in stopword:
+        sentence = sentence.replace(' ' + word + ' ', ' ')
+    
     sentence = re.sub(r'\s+', ' ', sentence)
 
     # temp_sentence = []

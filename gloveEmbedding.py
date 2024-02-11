@@ -1,8 +1,9 @@
 from glove import Corpus, Glove
 import pandas as pd
 import numpy as np
-from underthesea import word_tokenize
 from tensorflow.keras import utils
+from vncorenlp import VnCoreNLP
+from underthesea import word_tokenize
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
 from sklearn.model_selection import train_test_split
@@ -10,10 +11,11 @@ from sklearn.model_selection import train_test_split
 from constants import *
 from Nomarlize import normalizeSentence
 
+rdr = VnCoreNLP(PATH + "vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
 
 def getEmbeddingMatrix(tokenizer, vocab_size):
   print('LOADING GLOVE MODEL......................................')
-  glove_model = Glove.load(PATH + 'gloveModel300.model')
+  glove_model = Glove.load(PATH + MODEL + GLOVE_MODEL)
   emb_dict = dict()
 
   for word in list(glove_model.dictionary.keys()):
@@ -38,8 +40,8 @@ def tokenizeData(title, text):
 
   # TOKENIZE DATASET
   print('TOKENIZING DATASET.......................................')
-  title = [word_tokenize(sentence, format='text') for sentence in title]
-  text = [word_tokenize(sentence, format='text') for sentence in text]
+  title = [normalizeSentence('. '.join(' '.join(i) for i in rdr.tokenize(sentence))) for sentence in title]
+  text = [normalizeSentence('. '.join(' '.join(i) for i in rdr.tokenize(sentence))) for sentence in text]
 
   return title, text
 
@@ -91,8 +93,11 @@ def trainGlove():
   # Tokenize data
 
   print('TOKENIZING DATA ...................')
-  data = [word_tokenize(normalizeSentence(sentence)) for sentence in data]
 
+  data = [normalizeSentence('. '.join(' '.join(i) for i in rdr.tokenize(sentence))).split() for sentence in data if sentence != '']
+  # data = [word_tokenize(normalizeSentence(sentence)) for sentence in data]
+  for i in data[0:50]:
+    print(i)
   # Training GLOVE model
 
   EMBEDDING_DIM = 200
@@ -102,7 +107,7 @@ def trainGlove():
   corpus.fit(data, window=15)
 
   glove = Glove(no_components=EMBEDDING_DIM, learning_rate=LEARNING_RATE)
-  glove.fit(corpus.matrix, epochs=300, no_threads=8, verbose=True)
+  glove.fit(corpus.matrix, epochs=200, no_threads=8, verbose=True)
   glove.add_dictionary(corpus.dictionary)
 
-  glove.save(PATH + 'gloveModel300.model')
+  glove.save(PATH + MODEL + GLOVE_MODEL)
