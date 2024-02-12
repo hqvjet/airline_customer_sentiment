@@ -1,4 +1,4 @@
-from keras.layers import Input, Embedding, Conv1D, GlobalMaxPooling1D, MaxPooling1D, Flatten, Dense, concatenate, Dropout, Average
+from keras.layers import Input, Embedding, Conv2D, MaxPool2D, Flatten, Dense, Concatenate, Dropout, Average, Reshape
 from keras.models import Model
 import numpy as np
 from sklearn.metrics import classification_report
@@ -41,26 +41,29 @@ class CNN:
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], weights=[self.embedding_matrix], trainable=TRAINABLE)(self.title_input)
+        reshape_title = Reshape((self.train_title.shape[1], EMBEDDING_DIM, 1))(title_embedding)
+        
         title_conv_blocks = []
         for filter_size in filter_sizes:
-            title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(title_embedding)
-            title_pool = MaxPooling1D(pool_size=self.train_title.shape[1] - filter_size + 1)(title_conv)
+            title_conv = Conv2D(num_filters, kernel_size=(filter_size, EMBEDDING_DIM), padding='valid', kernel_initializer='normal', activation='relu')(reshape_title)
+            title_pool = MaxPool2D(pool_size=(self.train_title.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(title_conv)
             # title_pool = GlobalMaxPooling1D()(title_conv)
             title_conv_blocks.append(title_pool)
-        title_concat = concatenate(title_conv_blocks, axis=-1)
+        title_concat = Concatenate(axis=1)(title_conv_blocks)
         title_flat = Flatten()(title_concat)
         title_drop = Dropout(DROP)(title_flat)
 
         # Input for text
         self.text_input = Input(shape=(self.train_text.shape[1],))
         text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], weights=[self.embedding_matrix], trainable=TRAINABLE)(self.text_input)
+        reshape_text = Reshape((self.train_text.shape[1], EMBEDDING_DIM, 1))(text_embedding)
         text_conv_blocks = []
         for filter_size in filter_sizes:
-            text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(text_embedding)
-            text_pool = MaxPooling1D(pool_size=self.train_text.shape[1] - filter_size + 1)(text_conv)
+            text_conv = Conv2D(num_filters, kernel_size=(filter_size, EMBEDDING_DIM), padding='valid', kernel_initializer='normal', activation='relu')(reshape_text)
+            text_pool = MaxPool2D(pool_size=(self.train_text.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(text_conv)
             # text_pool = GlobalMaxPooling1D()(text_conv)
             text_conv_blocks.append(text_pool)
-        text_concat = concatenate(text_conv_blocks, axis=-1)
+        text_concat = Concatenate(axis=1)(text_conv_blocks)
         text_flat = Flatten()(text_concat)
         text_drop = Dropout(DROP)(text_flat)
 
@@ -68,9 +71,9 @@ class CNN:
         average = Average()([title_drop, text_drop])
 
         # Additional layers of the model
-        dense1 = Dense(512, activation='relu')(average)
+        # dense1 = Dense(512, activation='relu')(average)
 
-        return Dense(3, activation='softmax')(dense1)
+        return Dense(3, activation='softmax')(average)
 
     def buildModel(self):
         # Build the model

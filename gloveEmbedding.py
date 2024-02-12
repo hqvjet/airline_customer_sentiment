@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from tensorflow.keras import utils
 from vncorenlp import VnCoreNLP
-from underthesea import word_tokenize
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
 from sklearn.model_selection import train_test_split
@@ -34,14 +33,10 @@ def getDataIDS(sentences, tokenizer):
   return pad_sequences(ids, padding='post', maxlen=MAX_LEN)
 
 def tokenizeData(title, text):
-  # NORMALIZE DATASET
-  title = [normalizeSentence(sentence) for sentence in title]
-  text = [normalizeSentence(sentence) for sentence in text]
-
   # TOKENIZE DATASET
   print('TOKENIZING DATASET.......................................')
-  title = [normalizeSentence('. '.join(' '.join(i) for i in rdr.tokenize(sentence))) for sentence in title]
-  text = [normalizeSentence('. '.join(' '.join(i) for i in rdr.tokenize(sentence))) for sentence in text]
+  title = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence))) for sentence in title]
+  text = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence))) for sentence in text]
 
   return title, text
 
@@ -77,7 +72,12 @@ def usingGlove():
   title_val, text_val = tokenizeData(title_val, text_val)
 
   tokenizer = Tokenizer()
-  tokenizer.fit_on_texts([title_train, title_val, text_train, text_val, title_test, text_test])
+  tokenizer.fit_on_texts(title_train)
+  tokenizer.fit_on_texts(title_val)
+  tokenizer.fit_on_texts(text_train)
+  tokenizer.fit_on_texts(text_val)
+  tokenizer.fit_on_texts(title_test)
+  tokenizer.fit_on_texts(text_test)
 
   title_train_ids, text_train_ids = prepareData(title_train, text_train, tokenizer)
   title_val_ids, text_val_ids = prepareData(title_val, text_val, tokenizer)
@@ -94,10 +94,8 @@ def trainGlove():
 
   print('TOKENIZING DATA ...................')
 
-  data = [normalizeSentence('. '.join(' '.join(i) for i in rdr.tokenize(sentence))).split() for sentence in data if sentence != '']
+  data = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence))).split() for sentence in data if sentence != '']
   # data = [word_tokenize(normalizeSentence(sentence)) for sentence in data]
-  for i in data[0:50]:
-    print(i)
   # Training GLOVE model
 
   EMBEDDING_DIM = 200

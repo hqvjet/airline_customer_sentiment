@@ -7,19 +7,14 @@ stopword = [word for word in stopword['stopword']]
 
 def normalizeSentence(sentence):
     RE_EMOJI = re.compile(u'([\U00002600-\U000027BF])|([\U0001f300-\U0001f64F])|([\U0001f680-\U0001f6FF])')
-    sentence = re.sub(r'\b\d+[\.,]', '.', sentence)
     sentence = RE_EMOJI.sub(r'', sentence)
-    sentence = re.sub(r'\b(?:[1-5]\.\d+|[1-5])\b|\b\d+(\.\d+)?(l|ml|cm|m|mm|km|tr|k)\b', '', sentence)
     sentence = re.sub(r'[^\w\s]', '', sentence)
-    sentence = re.sub(r'\b\d+\b', '', sentence)
+    sentence = re.sub(r'\b\d+[\.,/]\s*', '', sentence)
 
     for word in stopword:
         sentence = sentence.replace(' ' + word + ' ', ' ')
     
     sentence = re.sub(r'\s+', ' ', sentence)
-
-    # temp_sentence = []
-    # for word in sentence.split():
 
     return sentence.lower().strip()
 

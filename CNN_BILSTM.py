@@ -1,4 +1,4 @@
-from keras.layers import Input, Embedding, Conv1D, MaxPooling1D, Flatten, Dense, concatenate, Average
+from keras.layers import Input, Embedding, Conv2D, MaxPool2D, Flatten, Dense, Concatenate, Average, Bidirectional, LSTM, Reshape, Dropout
 from keras.models import Model
 import numpy as np
 from sklearn.metrics import classification_report
@@ -19,8 +19,7 @@ class CNN_BILSTM:
             val_text,
             val_rating,
             vocab_size,
-            cnn_model,
-            bilstm_mode
+            embedding_matrix
     ):
         self.title_input = None
         self.text_input = None
@@ -31,30 +30,67 @@ class CNN_BILSTM:
         self.val_text = val_text
         self.val_rating = val_rating
         self.vocab_size = vocab_size
-        self.cnn_model = cnn_model
-        self.bilstm_model = bilstm_mode
+        self.embedding_matrix = embedding_matrix
         self.output = self.getOutput() 
         self.model = self.buildModel()
 
     def getOutput(self):
-      # Define input layers for the title and text inputs
-      self.title_input = Input(shape=(self.train_title.shape[1],))
-      self.text_input = Input(shape=(self.train_text.shape[1],))
+    #   # Define input layers for the title and text inputs
+    #   self.title_input = Input(shape=(self.train_title.shape[1],))
+    #   self.text_input = Input(shape=(self.train_text.shape[1],))
 
-      # Get the predictions from the BiLSTM model
-      lstm_predictions = self.bilstm_model([self.title_input, self.text_input])
+    #   # Get the predictions from the BiLSTM model
+    #   lstm_predictions = self.bilstm_model([self.title_input, self.text_input])
 
-      # Get the predictions from the CNN model
-      cnn_predictions = self.cnn_model([self.title_input, self.text_input])
+    #   # Get the predictions from the CNN model
+    #   cnn_predictions = self.cnn_model([self.title_input, self.text_input])
 
-      # Average predictions
-      average_predictions = Average()([lstm_predictions, cnn_predictions])
+    #   # Average predictions
+    #   average_predictions = Average()([lstm_predictions, cnn_predictions])
 
-      # Add a dense layer
-      dense_layer = Dense(EMBEDDING_DIM, activation='relu')(average_predictions)
+    #   # Add a dense layer
+    #   dense_layer = Dense(EMBEDDING_DIM, activation='relu')(average_predictions)
 
-      # Add another dense layer for the final output
-      return Dense(3, activation='softmax')(dense_layer)
+    #   # Add another dense layer for the final output
+    #   return Dense(3, activation='softmax')(dense_layer)
+        # Define input layers for the title and text inputs
+        hidden_size = 256
+        DROP = 0.3
+        num_filters = 128
+        filter_sizes = [3, 4, 5]
+
+        self.title_input = Input(shape=(self.train_title.shape[1],))
+        self.text_input = Input(shape=(self.train_text.shape[1],))
+        title_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, weights=[self.embedding_matrix], trainable=TRAINABLE)(self.title_input)
+        text_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, weights=[self.embedding_matrix], trainable=TRAINABLE)(self.text_input)
+        title_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(title_embedding)
+        text_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(text_embedding)
+        title_reshape = Reshape((self.train_title.shape[1], hidden_size * 2, 1))(title_bilstm)
+        text_reshape = Reshape((self.train_text.shape[1], hidden_size * 2, 1))(text_bilstm)
+
+        title_conv_blocks = []
+        for filter_size in filter_sizes:
+            title_conv = Conv2D(num_filters, kernel_size=(filter_size, EMBEDDING_DIM), padding='valid', kernel_initializer='normal', activation='relu')(title_reshape)
+            title_pool = MaxPool2D(pool_size=(self.train_title.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(title_conv)
+            # title_pool = GlobalMaxPooling1D()(title_conv)
+            title_conv_blocks.append(title_pool)
+        title_concat = Concatenate(axis=1)(title_conv_blocks)
+        title_flat = Flatten()(title_concat)
+        title_drop = Dropout(DROP)(title_flat)
+        
+        text_conv_blocks = []
+        for filter_size in filter_sizes:
+            text_conv = Conv2D(num_filters, kernel_size=(filter_size, EMBEDDING_DIM), padding='valid', kernel_initializer='normal', activation='relu')(text_reshape)
+            text_pool = MaxPool2D(pool_size=(self.train_text.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(text_conv)
+            # text_pool = GlobalMaxPooling1D()(text_conv)
+            text_conv_blocks.append(text_pool)
+        text_concat = Concatenate(axis=1)(text_conv_blocks)
+        text_flat = Flatten()(text_concat)
+        text_drop = Dropout(DROP)(text_flat)
+
+        average = Average()([title_drop, text_drop])
+
+        return Dense(3, activation='softmax')(average)
 
     def buildModel(self):
         # Build the model

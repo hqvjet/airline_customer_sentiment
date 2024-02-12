@@ -38,6 +38,8 @@ class BiLSTM:
 
     def getOutput(self):
         # Define input layers for the title and text inputs
+        hidden_size = 256
+
         self.title_input = Input(shape=(self.train_title.shape[1],))
         self.text_input = Input(shape=(self.train_text.shape[1],))
 
@@ -47,9 +49,9 @@ class BiLSTM:
         text_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, weights=[self.embedding_matrix], trainable=TRAINABLE)(self.text_input)
 
         # Bidirectional LSTM layer for title
-        title_bilstm = Bidirectional(LSTM(EMBEDDING_DIM, return_sequences=True))(title_embedding)
+        title_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(title_embedding)
         # Bidirectional LSTM layer for text
-        text_bilstm = Bidirectional(LSTM(EMBEDDING_DIM, return_sequences=True))(text_embedding)
+        text_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(text_embedding)
 
         # Global Max Pooling layer for title
         title_pooling = GlobalMaxPooling1D()(title_bilstm)

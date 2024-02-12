@@ -14,6 +14,24 @@ emb_mat = getEmbeddingMatrix(tokenizer, vocab_size)
 
 # MODEL IMPLEMENTATION AND TRAINING
 def startLearning():
+  print('TRAINING USING LSTM MODEL.........................')
+  lstm = LSTM(
+    title_train_ids,
+    text_train_ids,
+    train_labels,
+    title_val_ids,
+    text_val_ids,
+    val_labels,
+    vocab_size,
+    emb_mat
+  )
+
+  lstm.trainModel()
+  lstm.testModel(
+    [np.array(title_test_ids), np.array(text_test_ids)], 
+    np.array(test_labels)
+  )
+  
   print('TRAINING USING CNN MODEL.......................')
   cnn = CNN(
     title_train_ids,
@@ -59,8 +77,7 @@ def startLearning():
     text_val_ids,
     val_labels,
     vocab_size,
-    cnn_model,
-    bilstm_model
+    emb_mat
   )
 
   cnn_bilstm.trainModel()
@@ -69,20 +86,4 @@ def startLearning():
     np.array(test_labels)
   )
 
-  # print('TRAINING USING LSTM MODEL.........................')
-  # lstm = LSTM(
-  #   title_train_ids,
-  #   text_train_ids,
-  #   train_labels,
-  #   title_val_ids,
-  #   text_val_ids,
-  #   val_labels,
-  #   vocab_size
-  # )
-
-  # lstm.trainModel()
-  # lstm.testModel(
-  #   [np.array(title_test_ids), np.array(text_test_ids)], 
-  #   np.array(test_labels)
-  # )
   print('TRAINING DONE.............................')

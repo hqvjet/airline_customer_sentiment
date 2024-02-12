@@ -1,9 +1,11 @@
 from keras.models import Model
 from tensorflow.keras.layers import Embedding
-from keras.layers import Input, Embedding, LSTM, Dropout, Dense, concatenate
+from keras.layers import Input, Embedding, LSTM as LSTM_model, Dense, Average
 from tensorflow.keras import utils
 from sklearn.metrics import classification_report
 import numpy as np
+from keras.utils import plot_model
+import matplotlib.pyplot as plt
 from constants import *
 
 
@@ -36,26 +38,18 @@ class LSTM:
     def getOutput(self):
         hidden_size = 256
 
-        # Đầu vào cho title
         self.title_input = Input(shape=(self.train_title.shape[1],))
-        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, weights=[self.embedding_matrix], input_length=self.train_title.shape[1], trainable=True)(self.title_input)
-        title_lstm = LSTM(hidden_size, return_sequences=True)(title_embedding)
-        title_lstm_dropout = Dropout(0.2)(title_lstm)
-        title_lstm_final = LSTM(hidden_size)(title_lstm_dropout)
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, weights=[self.embedding_matrix], input_length=self.train_title.shape[1], trainable=False)(self.title_input)
+        title_lstm = LSTM_model(hidden_size)(title_embedding)
 
-        # Đầu vào cho text
         self.text_input = Input(shape=(self.train_text.shape[1],))
-        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, weights=[self.embedding_matrix], input_length=self.train_text.shape[1], trainable=True)(self.text_input)
-        text_lstm = LSTM(hidden_size, return_sequences=True)(text_embedding)
-        text_lstm_dropout = Dropout(0.2)(text_lstm)
-        text_lstm_final = LSTM(hidden_size)(text_lstm_dropout)
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, weights=[self.embedding_matrix], input_length=self.train_text.shape[1], trainable=False)(self.text_input)
+        text_lstm = LSTM_model(hidden_size)(text_embedding)
 
-        # Kết hợp hai đầu vào
-        combined = concatenate([title_lstm_final, text_lstm_final])
+        average = Average()([title_lstm, text_lstm])
 
-        # Các bước còn lại của mô hình
-        dense1 = Dense(512, activation='relu')(combined)
-        return Dense(self.train_rating.shape[1], activation='softmax')(dense1)
+        # dense1 = Dense(512, activation='relu')(combined)
+        return Dense(self.train_rating.shape[1], activation='softmax')(average)
 
     def buildModel(self):
 
@@ -64,7 +58,8 @@ class LSTM:
 
         model_LSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         model_LSTM.summary()
-
+        plot_model(model_LSTM, to_file=PATH + MODEL_IMAGE + LSTM_IMAGE, show_shapes=True, show_layer_names=True)
+        
         return model_LSTM
 
     def trainModel(self):
@@ -78,11 +73,25 @@ class LSTM:
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating)
         )
 
-        self.model.save(PATH + 'LSTM.h5')
+        self.model.save(PATH + MODEL + LSTM_MODEL)
+
+        plt.figure()
+        plt.plot(history.history['accuracy'], label='Train Accuracy')
+        plt.plot(history.history['loss'], label='Train Loss')
+        plt.title('LSTM Model')
+        plt.ylabel('Value')
+        plt.xlabel('Epoch')
+        plt.legend()
+        plt.savefig(PATH + CHART + LSTM_CHART)
+        plt.close()
 
     def testModel(self, x_test, y_test):
         y_pred = self.model.predict(x_test)
         pred = np.argmax(y_pred,axis=1)
-        report = classification_report(y_test, utils.to_categorical(pred, num_classes=5))
-
+        report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
         print(report)
+
+        with open(PATH + REPORT + LSTM_REPORT, 'w') as file:
+            print(report, file=file)
+
+        print(f"Classification report saved to {PATH + REPORT + LSTM_REPORT}..................")
