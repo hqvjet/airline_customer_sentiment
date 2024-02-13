@@ -35,8 +35,8 @@ class CNN:
     def getOutput(self):
         # Input for title
         num_filters = 128
-        filter_sizes = [3, 4, 5]
-        DROP = 0.3
+        filter_sizes = [2, 3, 4, 5]
+        DROP = 0.5
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
@@ -116,11 +116,11 @@ class CNN:
         self.model = load_model(PATH + MODEL + CNN_MODEL)
         y_pred = self.model.predict(x_test)
         pred = np.argmax(y_pred, axis=1)
-        target_names = ['Negative', 'Neutral', 'Positive']
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
-        print(report)
+        acc_line = f'Accuracy: {acc}\n'
         acc = accuracy_score(y_test, utils.to_categorical(pred, num_classes=3))
-        print('accuracy: ',acc)
+        report += acc_line
+        print(report)
 
         with open(PATH + REPORT + CNN_REPORT, 'w') as file:
             print(report, file=file)
