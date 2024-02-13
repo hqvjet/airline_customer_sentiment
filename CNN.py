@@ -1,5 +1,6 @@
 from keras.layers import Input, Embedding, Conv2D, MaxPool2D, Flatten, Dense, Concatenate, Dropout, Average, Reshape
 from keras.models import Model
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 import numpy as np
 from sklearn.metrics import classification_report
 from constants import *
@@ -87,6 +88,9 @@ class CNN:
         return model_CNN
 
     def trainModel(self):
+        early_stopping = EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
+        checkpoint = ModelCheckpoint(PATH + MODEL + CNN_MODEL, save_best_only=True, monitor='val_loss', mode='min')
+        reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=7, verbose=1, epsilon=1e-4, mode='min')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
@@ -94,9 +98,10 @@ class CNN:
             batch_size=BATCH_SIZE,
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
+            callbacks=[early_stopping, checkpoint, reduce_lr_loss]
         )
 
-        self.model.save(PATH + MODEL + CNN_MODEL)
+        # self.model.save(PATH + MODEL + CNN_MODEL)
 
         plt.figure()
         plt.plot(history.history['accuracy'], label='Train Accuracy')
