@@ -1,7 +1,8 @@
-from keras.layers import Input, Embedding, Conv1D, GlobalMaxPooling1D, MaxPooling1D, Flatten, Dense, concatenate, Dropout, Average
+from keras.layers import Input, Embedding, Conv2D, MaxPool2D, Flatten, Dense, Concatenate, Dropout, Average, Reshape
 from keras.models import Model
 import numpy as np
 from sklearn.metrics import classification_report
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from constants import *
 from tensorflow.keras import utils
 from keras.utils import plot_model
@@ -39,26 +40,27 @@ class CNN:
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
+        reshape_title = Reshape((self.train_title.shape[1], EMBEDDING_DIM, 1))(title_embedding)
+        
         title_conv_blocks = []
         for filter_size in filter_sizes:
-            title_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(title_embedding)
-            title_pool = MaxPooling1D(pool_size=self.train_title.shape[1] - filter_size + 1)(title_conv)
-            # title_pool = GlobalMaxPooling1D()(title_conv)
+            title_conv = Conv2D(num_filters, kernel_size=(filter_size, EMBEDDING_DIM), padding='valid', kernel_initializer='normal', activation='relu')(reshape_title)
+            title_pool = MaxPool2D(pool_size=(self.train_title.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(title_conv)
             title_conv_blocks.append(title_pool)
-        title_concat = concatenate(title_conv_blocks, axis=-1)
+        title_concat = Concatenate(axis=1)(title_conv_blocks)
         title_flat = Flatten()(title_concat)
         title_drop = Dropout(DROP)(title_flat)
 
         # Input for text
         self.text_input = Input(shape=(self.train_text.shape[1],))
         text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=TRAINABLE)(self.text_input)
+        reshape_text = Reshape((self.train_text.shape[1], EMBEDDING_DIM, 1))(text_embedding)
         text_conv_blocks = []
         for filter_size in filter_sizes:
-            text_conv = Conv1D(filters=num_filters, kernel_size=filter_size, activation='relu')(text_embedding)
-            text_pool = MaxPooling1D(pool_size=self.train_text.shape[1] - filter_size + 1)(text_conv)
-            # text_pool = GlobalMaxPooling1D()(text_conv)
+            text_conv = Conv2D(num_filters, kernel_size=(filter_size, EMBEDDING_DIM), padding='valid', kernel_initializer='normal', activation='relu')(reshape_text)
+            text_pool = MaxPool2D(pool_size=(self.train_text.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(text_conv)
             text_conv_blocks.append(text_pool)
-        text_concat = concatenate(text_conv_blocks, axis=-1)
+        text_concat = Concatenate(axis=1)(text_conv_blocks)
         text_flat = Flatten()(text_concat)
         text_drop = Dropout(DROP)(text_flat)
 
@@ -66,9 +68,10 @@ class CNN:
         average = Average()([title_drop, text_drop])
 
         # Additional layers of the model
-        dense1 = Dense(512, activation='relu')(average)
+        dense1 = Dense(256, activation='relu')(average)
 
         return Dense(3, activation='softmax')(dense1)
+
 
     def buildModel(self):
         # Build the model
@@ -77,11 +80,14 @@ class CNN:
         model_CNN.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         model_CNN.summary()
         
-        plot_model(model_CNN, to_file='CNN.png', show_shapes=True, show_layer_names=True)
+        plot_model(model_CNN, to_file=PATH + MODEL_IMAGE + CNN_IMAGE, show_shapes=True, show_layer_names=True)
 
         return model_CNN
 
     def trainModel(self):
+        early_stopping = EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
+        checkpoint = ModelCheckpoint(PATH + MODEL + CNN_MODEL, save_best_only=True, monitor='val_loss', mode='min')
+        reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=7, verbose=1, epsilon=1e-4, mode='min')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
@@ -89,19 +95,20 @@ class CNN:
             batch_size=BATCH_SIZE,
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
+            callbacks=[early_stopping, checkpoint, reduce_lr_loss]
         )
 
-        self.model.save(PATH + CNN_MODEL)
+        # self.model.save(PATH + MODEL + CNN_MODEL)
 
-        # Plot training accuracy and loss values in the same plot
+        plt.figure()
         plt.plot(history.history['accuracy'], label='Train Accuracy')
         plt.plot(history.history['loss'], label='Train Loss')
         plt.title('CNN Model')
         plt.ylabel('Value')
         plt.xlabel('Epoch')
         plt.legend()
-        plt.savefig(PATH + 'CNN_chart.png')  # Lưu biểu đồ vào file
-        # plt.show()
+        plt.savefig(PATH + CHART + CNN_CHART)
+        plt.close()
 
         return self.model
     
@@ -111,7 +118,7 @@ class CNN:
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
         print(report)
 
-        with open(PATH + CNN_REPORT, 'w') as file:
+        with open(PATH + REPORT + CNN_REPORT, 'w') as file:
             print(report, file=file)
 
-        print(f"Classification report saved to {PATH + CNN_REPORT}..................")
+        print(f"Classification report saved to {PATH + REPORT + CNN_REPORT}..................")
