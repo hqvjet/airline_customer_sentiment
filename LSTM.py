@@ -1,11 +1,13 @@
-from keras.models import Model
+from keras.models import Model, load_model
 from tensorflow.keras.layers import Embedding
 from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, concatenate, Average
 from tensorflow.keras import utils
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 import numpy as np
 from constants import *
 from keras.utils import plot_model
+import matplotlib.pyplot as plt
 
 
 class LSTM:
@@ -33,29 +35,20 @@ class LSTM:
         self.model = self.buildModel()
 
     def getOutput(self):
-        hidden_size = 512
-        DROP = 0.3
+        hidden_size = 256
 
-        # Đầu vào cho title
         self.title_input = Input(shape=(self.train_title.shape[1],))
-        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
-        title_lstm = LSTM_model(hidden_size, return_sequences=True)(title_embedding)
-        title_lstm_dropout = Dropout(DROP)(title_lstm)
-        title_lstm_final = LSTM_model(hidden_size)(title_lstm_dropout)
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=True)(self.title_input)
+        title_lstm = LSTM_model(hidden_size)(title_embedding)
 
-        # Đầu vào cho text
         self.text_input = Input(shape=(self.train_text.shape[1],))
-        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=TRAINABLE)(self.text_input)
-        text_lstm = LSTM_model(hidden_size, return_sequences=True)(text_embedding)
-        text_lstm_dropout = Dropout(DROP)(text_lstm)
-        text_lstm_final = LSTM_model(hidden_size)(text_lstm_dropout)
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=True)(self.text_input)
+        text_lstm = LSTM_model(hidden_size)(text_embedding)
 
-        # Kết hợp hai đầu vào
-        combined = Average()([title_lstm_final, text_lstm_final])
+        average = Average()([title_lstm, text_lstm])
 
-        # Các bước còn lại của mô hình
-        dense1 = Dense(512, activation='relu')(combined)
-        return Dense(self.train_rating.shape[1], activation='softmax')(dense1)
+        # dense1 = Dense(512, activation='relu')(combined)
+        return Dense(self.train_rating.shape[1], activation='softmax')(average)
 
     def buildModel(self):
 
@@ -70,26 +63,42 @@ class LSTM:
         return model_LSTM
 
     def trainModel(self):
-
+        early_stopping = EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
+        checkpoint = ModelCheckpoint(PATH + MODEL + LSTM_MODEL, save_best_only=True, monitor='val_loss', mode='min')
+        reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=7, verbose=1, epsilon=1e-4, mode='min')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
             epochs=EPOCH,
             batch_size=BATCH_SIZE,
             verbose=1,
-            validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating)
+            validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
+            callbacks=[early_stopping, checkpoint, reduce_lr_loss]
         )
 
-        self.model.save(PATH + LSTM_MODEL)
+        # self.model.save(PATH + LSTM_MODEL)
+
+        plt.figure()
+        plt.plot(history.history['accuracy'], label='Train Accuracy')
+        plt.plot(history.history['loss'], label='Train Loss')
+        plt.title('CNN Model')
+        plt.ylabel('Value')
+        plt.xlabel('Epoch')
+        plt.legend()
+        plt.savefig(PATH + CHART + LSTM_CHART)
+        plt.close()
 
     def testModel(self, x_test, y_test):
+        self.model = load_model(PATH + MODEL + LSTM_MODEL)
         y_pred = self.model.predict(x_test)
-        pred = np.argmax(y_pred,axis=1)
+        pred = np.argmax(y_pred, axis=1)
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
-
+        acc = accuracy_score(y_test, utils.to_categorical(pred, num_classes=3))
+        acc_line = f'Accuracy: {acc}\n'
+        report += acc_line
         print(report)
 
-        with open(PATH + LSTM_REPORT, 'w') as file:
+        with open(PATH + REPORT + LSTM_REPORT, 'w') as file:
             print(report, file=file)
 
-        print(f"Classification report saved to {PATH + LSTM_REPORT}...................")
+        print(f"Classification report saved to {PATH + REPORT + LSTM_REPORT}..................")
