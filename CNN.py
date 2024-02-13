@@ -35,8 +35,8 @@ class CNN:
     def getOutput(self):
         # Input for title
         num_filters = 128
-        filter_sizes = [2, 3, 4, 5]
-        DROP = 0.5
+        filter_sizes = [2, 3, 4, 5, 6, 7]
+        DROP = 0.1
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
