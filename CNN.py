@@ -117,8 +117,8 @@ class CNN:
         y_pred = self.model.predict(x_test)
         pred = np.argmax(y_pred, axis=1)
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
-        acc_line = f'Accuracy: {acc}\n'
         acc = accuracy_score(y_test, utils.to_categorical(pred, num_classes=3))
+        acc_line = f'Accuracy: {acc}\n'
         report += acc_line
         print(report)
 
