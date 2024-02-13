@@ -47,8 +47,8 @@ class LSTM:
 
         average = Average()([title_lstm, text_lstm])
 
-        # dense1 = Dense(512, activation='relu')(combined)
-        return Dense(self.train_rating.shape[1], activation='softmax')(average)
+        dense1 = Dense(512, activation='relu')(average)
+        return Dense(self.train_rating.shape[1], activation='softmax')(dense1)
 
     def buildModel(self):
 
@@ -63,9 +63,9 @@ class LSTM:
         return model_LSTM
 
     def trainModel(self):
-        early_stopping = EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
+        early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min', restore_best_weights=True)
         checkpoint = ModelCheckpoint(PATH + MODEL + LSTM_MODEL, save_best_only=True, monitor='val_loss', mode='min')
-        reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=7, verbose=1, epsilon=1e-4, mode='min')
+        reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=LR_PATIENCE, verbose=1, epsilon=1e-4, mode='min')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
