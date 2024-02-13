@@ -1,7 +1,7 @@
 from keras.layers import Input, Embedding, Conv2D, MaxPool2D, Flatten, Dense, Concatenate, Dropout, Average, Reshape
 from keras.models import Model, load_model
 import numpy as np
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from constants import *
 from tensorflow.keras import utils
@@ -115,9 +115,12 @@ class CNN:
     def testModel(self, x_test, y_test):
         self.model = load_model(PATH + MODEL + CNN_MODEL)
         y_pred = self.model.predict(x_test)
-        pred = np.argmax(y_pred,axis=1)
-        report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
+        pred = np.argmax(y_pred, axis=1)
+        target_names = ['Negative', 'Neutral', 'Positive']
+        report = classification_report(y_test, utils.to_categorical(pred, num_classes=3), target_names)
         print(report)
+        acc = accuracy_score(y_test, utils.to_categorical(pred, num_classes=3))
+        print('accuracy: ',acc)
 
         with open(PATH + REPORT + CNN_REPORT, 'w') as file:
             print(report, file=file)
