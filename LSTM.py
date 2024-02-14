@@ -1,6 +1,7 @@
 from keras.models import Model, load_model
+from keras import regularizers
 from tensorflow.keras.layers import Embedding
-from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, concatenate, Average
+from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, concatenate, Average, Sequential
 from tensorflow.keras import utils
 from sklearn.metrics import classification_report, accuracy_score
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
@@ -35,7 +36,8 @@ class LSTM:
         self.model = self.buildModel()
 
     def getOutput(self):
-        hidden_size = 256
+        hidden_size = 128
+        DROP = 0.5
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=True)(self.title_input)
@@ -47,8 +49,11 @@ class LSTM:
 
         average = Average()([title_lstm, text_lstm])
 
-        dense1 = Dense(512, activation='relu')(average)
-        return Dense(self.train_rating.shape[1], activation='softmax')(dense1)
+        final = Dropout(DROP)(average)
+        final = LSTM_model(hidden_size)(final)
+        final = Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.01), activity_regularizer=regularizers.l1(0.01))(final)
+
+        return Dense(self.train_rating.shape[1], activation='softmax')(final)
 
     def buildModel(self):
 
