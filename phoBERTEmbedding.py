@@ -55,18 +55,10 @@ def getMask(data_ids):
     return torch.tensor(data_masks)
 
 def prepareData(title, text):
-    # NORMALIZE DATASET
-    title = [normalizeSentence(sentence) for sentence in title]
-    text = [normalizeSentence(sentence) for sentence in text]
-
     # TOKENIZE DATASET
     print('TOKENIZING DATASET.......................................')
-    title = [rdr.tokenize(sentence) for sentence in title]
-    text = [rdr.tokenize(sentence) for sentence in text]
-    title = [[' '.join(word) for word in sentence] for sentence in title]
-    text = [[' '.join(word) for word in sentence] for sentence in text]
-    title = [' '.join(sentence) for sentence in title]
-    text = [' '.join(sentence) for sentence in text]
+    title = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence))) for sentence in title]
+    text = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence))) for sentence in text]
 
     # MAPPING TO VOCAB
     print('MAPPING AND PADDING DATASET..............................')
