@@ -36,7 +36,7 @@ class BiLSTM:
         self.model = self.buildModel()
 
     def getOutput(self):
-        hidden_size = 128
+        hidden_size = 256
         DROP = 0.5
         # Define input layers for the title and text inputs
         self.title_input = Input(shape=(self.train_title.shape[1],))
@@ -59,10 +59,9 @@ class BiLSTM:
 
         # Concatenate title and text pooling layers
         average_pooling = Average()([title_pooling, text_pooling])
-        drop = Dropout(0.5)(average_pooling)
 
         # Dense layer for final prediction
-        output_layer = Dense(3, activation='softmax')(drop)
+        output_layer = Dense(3, activation='softmax')(average_pooling)
 
         return output_layer
 
