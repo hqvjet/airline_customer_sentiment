@@ -1,7 +1,7 @@
 from keras.models import Model, load_model
 from keras import regularizers
 from tensorflow.keras.layers import Embedding
-from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, concatenate, Average, Sequential
+from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, concatenate, Average
 from tensorflow.keras import utils
 from sklearn.metrics import classification_report, accuracy_score
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
