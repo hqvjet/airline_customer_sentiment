@@ -1,4 +1,4 @@
-from keras.layers import Input, Bidirectional, LSTM, Dense, GlobalAveragePooling1D, Dropout
+from keras.layers import Input, Bidirectional, LSTM, Dense, GlobalMaxPooling1D, Dropout
 from keras.models import Model, load_model
 from tensorflow.keras.layers import Embedding, Average, Concatenate
 from keras.layers import concatenate
@@ -53,15 +53,17 @@ class BiLSTM:
         text_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(text_embedding)
 
         # Global Max Pooling layer for title
-        title_pooling = GlobalAveragePooling1D()(title_bilstm)
+        title_pooling = GlobalMaxPooling1D()(title_bilstm)
         # Global Max Pooling layer for text
-        text_pooling = GlobalAveragePooling1D()(text_bilstm)
+        text_pooling = GlobalMaxPooling1D()(text_bilstm)
 
         # Concatenate title and text pooling layers
-        average_pooling = Concatenate()([title_pooling, text_pooling])
+        average_pooling = Average()([title_pooling, text_pooling])
+        drop = Dropout(DROP)(average_pooling)
+        dense1 = Dense(256, activation='relu')(drop)
 
         # Dense layer for final prediction
-        output_layer = Dense(3, activation='softmax')(average_pooling)
+        output_layer = Dense(3, activation='softmax')(dense1)
 
         return output_layer
 
@@ -95,7 +97,7 @@ class BiLSTM:
         plt.figure()
         plt.plot(history.history['accuracy'], label='Train Accuracy')
         plt.plot(history.history['loss'], label='Train Loss')
-        plt.title('CNN Model')
+        plt.title('BiLSTM Model')
         plt.ylabel('Value')
         plt.xlabel('Epoch')
         plt.legend()

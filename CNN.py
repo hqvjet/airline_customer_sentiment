@@ -34,9 +34,9 @@ class CNN:
 
     def getOutput(self):
         # Input for title
-        num_filters = 128
-        filter_sizes = [2, 3, 4, 5, 6, 7]
-        DROP = 0.1
+        num_filters = 256
+        filter_sizes = [2, 3, 4, 5]
+        DROP = 0.5
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
@@ -72,7 +72,6 @@ class CNN:
 
         return Dense(3, activation='softmax')(dense1)
 
-
     def buildModel(self):
         # Build the model
         model_CNN = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
@@ -85,9 +84,9 @@ class CNN:
         return model_CNN
 
     def trainModel(self):
-        early_stopping = EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
+        early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min')
         checkpoint = ModelCheckpoint(PATH + MODEL + CNN_MODEL, save_best_only=True, monitor='val_loss', mode='min')
-        reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=7, verbose=1, epsilon=1e-4, mode='min')
+        reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=LR_PATIENCE, verbose=1, epsilon=1e-4, mode='min')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
