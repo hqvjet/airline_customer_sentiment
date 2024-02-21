@@ -1,10 +1,11 @@
-from keras.layers import Input, Bidirectional, LSTM, Dense, GlobalMaxPooling1D
+from keras.layers import Input, Bidirectional, LSTM, Dense, Dropout
 from keras.models import Model
 from tensorflow.keras.layers import Embedding, Average, Concatenate
 from keras.layers import concatenate
 from sklearn.metrics import classification_report
 from tensorflow.keras import utils
 import numpy as np
+import tensorflow as tf
 from constants import *
 from keras.utils import plot_model
 import matplotlib.pyplot as plt
@@ -37,34 +38,25 @@ class BiLSTM:
         self.model = self.buildModel()
 
     def getOutput(self):
-        # Define input layers for the title and text inputs
         hidden_size = 256
+        DROP = 0.3
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], weights=[self.embedding_matrix], trainable=TRAINABLE)(self.title_input)
+        title_lstm = Bidirectional(LSTM(hidden_size))(title_embedding)
+        title_lstm = Dropout(DROP)(title_lstm)
+
         self.text_input = Input(shape=(self.train_text.shape[1],))
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], weights=[self.embedding_matrix], trainable=TRAINABLE)(self.text_input)
+        text_lstm = Bidirectional(LSTM(hidden_size))(text_embedding)
+        text_lstm = Dropout(DROP)(text_lstm)
 
-        # Embedding layer for title
-        title_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, weights=[self.embedding_matrix], trainable=TRAINABLE)(self.title_input)
-        # Embedding layer for text
-        text_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, weights=[self.embedding_matrix], trainable=TRAINABLE)(self.text_input)
+        average = Average()([title_lstm, text_lstm])
 
-        # Bidirectional LSTM layer for title
-        title_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(title_embedding)
-        # Bidirectional LSTM layer for text
-        text_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(text_embedding)
+        final = Dense(200, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001))(average)
+        final = Dropout(DROP)(final)
 
-        # Global Max Pooling layer for title
-        title_pooling = GlobalMaxPooling1D()(title_bilstm)
-        # Global Max Pooling layer for text
-        text_pooling = GlobalMaxPooling1D()(text_bilstm)
-
-        # Concatenate title and text pooling layers
-        average_pooling = Average()([title_pooling, text_pooling])
-
-        # Dense layer for final prediction
-        output_layer = Dense(3, activation='softmax')(average_pooling)
-
-        return output_layer
+        return Dense(3, activation='softmax')(final)
 
     def buildModel(self):
         # Build the model
