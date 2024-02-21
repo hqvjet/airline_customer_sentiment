@@ -40,20 +40,19 @@ class LSTM:
         DROP = 0.5
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
-        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=True)(self.title_input)
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=False)(self.title_input)
         title_lstm = LSTM_model(hidden_size)(title_embedding)
 
         self.text_input = Input(shape=(self.train_text.shape[1],))
-        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=True)(self.text_input)
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=False)(self.text_input)
         text_lstm = LSTM_model(hidden_size)(text_embedding)
 
         average = Average()([title_lstm, text_lstm])
 
+        final = Dense(64, activation='relu')(average)
         final = Dropout(DROP)(average)
-        final = LSTM_model(hidden_size)(final)
-        final = Dense(64, activation='relu', kernel_regularizer=regularizers.l2(0.01), activity_regularizer=regularizers.l1(0.01))(final)
 
-        return Dense(self.train_rating.shape[1], activation='softmax')(final)
+        return Dense(3, activation='softmax')(final)
 
     def buildModel(self):
 
@@ -63,13 +62,13 @@ class LSTM:
         model_LSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         model_LSTM.summary()
         
-        plot_model(model_LSTM, to_file='LSTM.png', show_shapes=True, show_layer_names=True)
+        plot_model(model_LSTM, to_file=PATH + MODEL_IMAGE + LSTM_IMAGE, show_shapes=True, show_layer_names=True)
 
         return model_LSTM
 
     def trainModel(self):
         early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min', restore_best_weights=True)
-        checkpoint = ModelCheckpoint(PATH + MODEL + LSTM_MODEL, save_best_only=True, monitor='val_loss', mode='min')
+        checkpoint = ModelCheckpoint(PATH + MODEL + LSTM_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
         reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=LR_PATIENCE, verbose=1, epsilon=1e-4, mode='min')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],

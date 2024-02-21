@@ -1,4 +1,4 @@
-from keras.layers import Input, Bidirectional, LSTM, Dense, GlobalMaxPooling1D, Dropout
+from keras.layers import Input, Bidirectional, LSTM, Dense, SpatialDropout1D, Dropout
 from keras.models import Model, load_model
 from tensorflow.keras.layers import Embedding, Average, Concatenate
 from keras.layers import concatenate
@@ -37,7 +37,7 @@ class BiLSTM:
 
     def getOutput(self):
         hidden_size = 256
-        DROP = 0.5
+        DROP = 0.2
         # Define input layers for the title and text inputs
         self.title_input = Input(shape=(self.train_title.shape[1],))
         self.text_input = Input(shape=(self.train_text.shape[1],))
@@ -47,23 +47,25 @@ class BiLSTM:
         # Embedding layer for text
         text_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, trainable=TRAINABLE)(self.text_input)
 
-        # Bidirectional LSTM layer for title
-        title_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(title_embedding)
-        # Bidirectional LSTM layer for text
-        text_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(text_embedding)
+        title_avg = SpatialDropout1D(DROP)(title_embedding)
+        text_avg = SpatialDropout1D(DROP)(text_embedding)
 
-        # Global Max Pooling layer for title
-        title_pooling = GlobalMaxPooling1D()(title_bilstm)
-        # Global Max Pooling layer for text
-        text_pooling = GlobalMaxPooling1D()(text_bilstm)
+        # Bidirectional LSTM layer for title
+        title_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(title_avg)
+        # Bidirectional LSTM layer for text
+        text_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(text_avg)
+
+        title_bilstm = Dropout(DROP)(title_bilstm)
+        text_bilstm = Dropout(DROP)(text_bilstm)
 
         # Concatenate title and text pooling layers
-        average_pooling = Average()([title_pooling, text_pooling])
-        drop = Dropout(DROP)(average_pooling)
-        dense1 = Dense(256, activation='relu')(drop)
+        average_pooling = Average()([title_bilstm, text_bilstm])
+        dense = Dense(128, activation='relu')(average_pooling)
+        dense = Dense(64, activation='relu')(dense)
+        dense = Dense(32, activation='relu')(dense)
 
         # Dense layer for final prediction
-        output_layer = Dense(3, activation='softmax')(dense1)
+        output_layer = Dense(3, activation='softmax')(dense)
 
         return output_layer
 
