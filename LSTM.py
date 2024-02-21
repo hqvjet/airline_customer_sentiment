@@ -63,10 +63,7 @@ class LSTM:
         # Xây dựng mô hình
         model_LSTM = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        original = np.argmax(self.train_rating, axis=1)
-        print(original)
-        class_weights = compute_class_weight('balanced', classes=[0,1,2], y=original)
-        model_LSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'], class_weight=class_weights)
+        model_LSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         model_LSTM.summary()
         
         plot_model(model_LSTM, to_file=PATH + MODEL_IMAGE + LSTM_IMAGE, show_shapes=True, show_layer_names=True)
@@ -74,6 +71,8 @@ class LSTM:
         return model_LSTM
 
     def trainModel(self):
+        original = np.argmax(self.train_rating, axis=1)
+        class_weights = compute_class_weight('balanced', classes=[0,1,2], y=original)
         early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min')
         checkpoint = ModelCheckpoint(PATH + MODEL + LSTM_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
         history = self.model.fit(
@@ -83,7 +82,8 @@ class LSTM:
             batch_size=BATCH_SIZE,
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
-            callbacks=[early_stopping, checkpoint]
+            callbacks=[early_stopping, checkpoint],
+            sample_weight=class_weights
         )
 
         # self.model.save(PATH + LSTM_MODEL)
