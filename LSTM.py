@@ -40,11 +40,11 @@ class LSTM:
         DROP = 0.5
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
-        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=False)(self.title_input)
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
         title_lstm = LSTM_model(hidden_size)(title_embedding)
 
         self.text_input = Input(shape=(self.train_text.shape[1],))
-        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=False)(self.text_input)
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=TRAINABLE)(self.text_input)
         text_lstm = LSTM_model(hidden_size)(text_embedding)
 
         average = Average()([title_lstm, text_lstm])
@@ -69,7 +69,6 @@ class LSTM:
     def trainModel(self):
         early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min', restore_best_weights=True)
         checkpoint = ModelCheckpoint(PATH + MODEL + LSTM_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
-        reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=LR_PATIENCE, verbose=1, epsilon=1e-4, mode='min')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
@@ -77,7 +76,7 @@ class LSTM:
             batch_size=BATCH_SIZE,
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
-            callbacks=[early_stopping, checkpoint, reduce_lr_loss]
+            callbacks=[early_stopping, checkpoint]
         )
 
         # self.model.save(PATH + LSTM_MODEL)
