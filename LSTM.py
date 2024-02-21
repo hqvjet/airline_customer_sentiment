@@ -63,9 +63,9 @@ class LSTM:
         # Xây dựng mô hình
         model_LSTM = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        class_totals = self.train_rating.sum(axis=0)
+        original = np.argmax(self.train_rating, axis=1)
         print(class_totals)
-        class_weights = compute_class_weight('balanced', classes=[0,1,2,3], y=class_totals)
+        class_weights = compute_class_weight('balanced', classes=[0,1,2], y=original)
         model_LSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'], class_weight=class_weights)
         model_LSTM.summary()
         
