@@ -64,7 +64,8 @@ class LSTM:
         model_LSTM = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
         class_totals = self.train_rating.sum(axis=0)
-        class_weights = compute_class_weight('balanced', classes=[0,1,2], y=class_totals)
+        print(class_totals)
+        class_weights = compute_class_weight('balanced', classes=[0,1,2,3], y=class_totals)
         model_LSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'], class_weight=class_weights)
         model_LSTM.summary()
         
