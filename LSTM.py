@@ -53,7 +53,7 @@ class LSTM:
         average = Average()([title_lstm, text_lstm])
 
         final = Dense(32, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))(average)
-        final = Dropout(DROP)(average)
+        final = Dropout(DROP)(final)
 
         return Dense(3, activation='softmax')(final)
 
