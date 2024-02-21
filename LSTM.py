@@ -8,6 +8,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 import numpy as np
 from constants import *
 from keras.utils import plot_model
+import tensorflow as tf
 import matplotlib.pyplot as plt
 
 
@@ -36,20 +37,22 @@ class LSTM:
         self.model = self.buildModel()
 
     def getOutput(self):
-        hidden_size = 128
+        hidden_size = 64
         DROP = 0.5
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
         title_lstm = LSTM_model(hidden_size)(title_embedding)
+        title_lstm = Dropout(DROP)(title_lstm)
 
         self.text_input = Input(shape=(self.train_text.shape[1],))
         text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=TRAINABLE)(self.text_input)
         text_lstm = LSTM_model(hidden_size)(text_embedding)
+        text_lstm = Dropout(DROP)(text_lstm)
 
         average = Average()([title_lstm, text_lstm])
 
-        final = Dense(64, activation='relu')(average)
+        final = Dense(32, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))(average)
         final = Dropout(DROP)(average)
 
         return Dense(3, activation='softmax')(final)
