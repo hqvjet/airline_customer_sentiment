@@ -5,6 +5,7 @@ from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, c
 from tensorflow.keras import utils
 from sklearn.metrics import classification_report, accuracy_score
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 from constants import *
 from keras.utils import plot_model
@@ -37,8 +38,8 @@ class LSTM:
         self.model = self.buildModel()
 
     def getOutput(self):
-        hidden_size = 64
-        DROP = 0.5
+        hidden_size = 256
+        DROP = 0.3
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
@@ -52,7 +53,7 @@ class LSTM:
 
         average = Average()([title_lstm, text_lstm])
 
-        final = Dense(32, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001))(average)
+        final = Dense(200, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001))(average)
         final = Dropout(DROP)(final)
 
         return Dense(3, activation='softmax')(final)
@@ -62,7 +63,8 @@ class LSTM:
         # Xây dựng mô hình
         model_LSTM = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        model_LSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        class_weights = compute_class_weight('balanced', np.unique(self.train_rating), self.train_rating)
+        model_LSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'], class_weight=class_weights)
         model_LSTM.summary()
         
         plot_model(model_LSTM, to_file=PATH + MODEL_IMAGE + LSTM_IMAGE, show_shapes=True, show_layer_names=True)
@@ -70,7 +72,7 @@ class LSTM:
         return model_LSTM
 
     def trainModel(self):
-        early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min', restore_best_weights=True)
+        early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min')
         checkpoint = ModelCheckpoint(PATH + MODEL + LSTM_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
@@ -87,7 +89,7 @@ class LSTM:
         plt.figure()
         plt.plot(history.history['accuracy'], label='Train Accuracy')
         plt.plot(history.history['loss'], label='Train Loss')
-        plt.title('CNN Model')
+        plt.title('LSTM MODEL')
         plt.ylabel('Value')
         plt.xlabel('Epoch')
         plt.legend()
