@@ -98,7 +98,6 @@ def trainGlove():
   # data = [word_tokenize(normalizeSentence(sentence)) for sentence in data]
   # Training GLOVE model
 
-  EMBEDDING_DIM = 200
   LEARNING_RATE = 0.01
 
   corpus = Corpus()
