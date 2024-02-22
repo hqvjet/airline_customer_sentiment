@@ -47,8 +47,8 @@ class CNN:
         title_conv_blocks = []
         for filter_size in filter_sizes:
             title_conv = Conv2D(num_filters, kernel_size=(filter_size, EMBEDDING_DIM), padding='valid', kernel_initializer='normal', activation='relu')(reshape_title)
-            title_pool = GlobalMaxPool2D(pool_size=(self.train_title.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(title_conv)
-            # title_pool = GlobalMaxPooling1D()(title_conv)
+            # title_pool = MaxPool2D(pool_size=(self.train_title.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(title_conv)
+            title_pool = GlobalMaxPool2D()(title_conv)
             title_conv_blocks.append(title_pool)
         title_concat = Concatenate(axis=1)(title_conv_blocks)
         title_flat = Flatten()(title_concat)
@@ -61,8 +61,8 @@ class CNN:
         text_conv_blocks = []
         for filter_size in filter_sizes:
             text_conv = Conv2D(num_filters, kernel_size=(filter_size, EMBEDDING_DIM), padding='valid', kernel_initializer='normal', activation='relu')(reshape_text)
-            text_pool = GlobalMaxPool2D(pool_size=(self.train_text.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(text_conv)
-            # text_pool = GlobalMaxPooling1D()(text_conv)
+            # text_pool = MaxPool2D(pool_size=(self.train_text.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(text_conv)
+            text_pool = GlobalMaxPool2D()(text_conv)
             text_conv_blocks.append(text_pool)
         text_concat = Concatenate(axis=1)(text_conv_blocks)
         text_flat = Flatten()(text_concat)
