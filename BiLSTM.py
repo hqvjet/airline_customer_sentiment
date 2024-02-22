@@ -1,8 +1,9 @@
 from keras.layers import Input, Bidirectional, LSTM, Dense, Dropout
-from keras.models import Model
+from keras.models import Model, load_model
 from tensorflow.keras.layers import Embedding, Average, Concatenate
 from keras.layers import concatenate
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from tensorflow.keras import utils
 import numpy as np
 import tensorflow as tf
@@ -70,21 +71,24 @@ class BiLSTM:
         return model_BiLSTM
 
     def trainModel(self):
+        early_stopping = EarlyStopping(monitor='val_accuracy', patience=STOP_PATIENCE, verbose=0, mode='max')
+        checkpoint = ModelCheckpoint(PATH + MODEL + BILSTM_MODEL, save_best_only=True, monitor='val_loss', mode='min')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
             epochs=EPOCH,
             batch_size=BATCH_SIZE,
             verbose=1,
-            validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating)
+            validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
+            callbacks=[early_stopping, checkpoint]
         )
 
-        self.model.save(PATH + MODEL + BILSTM_MODEL)
+        # self.model.save(PATH + MODEL + BILSTM_MODEL)
 
         # Plot training accuracy and loss values in the same plot
         plt.figure()
-        plt.plot(history.history['accuracy'], label='Train Accuracy')
-        plt.plot(history.history['loss'], label='Train Loss')
+        plt.plot(history.history['val_accuracy'], label='Accuracy')
+        plt.plot(history.history['val_loss'], label='Loss')
         plt.title('BiLSTM Model')
         plt.ylabel('Value')
         plt.xlabel('Epoch')
@@ -95,13 +99,16 @@ class BiLSTM:
         return self.model
     
     def testModel(self, x_test, y_test):
+        self.model = load_model(PATH + MODEL + BILSTM_MODEL)
         y_pred = self.model.predict(x_test)
-        pred = np.argmax(y_pred,axis=1)
+        pred = np.argmax(y_pred, axis=1)
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
-
+        acc = accuracy_score(y_test, utils.to_categorical(pred, num_classes=3))
+        acc_line = f'Accuracy: {acc}\n'
+        report += acc_line
         print(report)
 
         with open(PATH + REPORT + BILSTM_REPORT, 'w') as file:
             print(report, file=file)
 
-        print(f"Classification report saved to {PATH + REPORT + BILSTM_REPORT}")
+        print(f"Classification report saved to {PATH + REPORT + BILSTM_REPORT}..................")
