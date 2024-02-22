@@ -1,5 +1,6 @@
 from keras.layers import Input, Embedding, Conv2D, MaxPool2D, Flatten, Dense, Concatenate, Dropout, Average, Reshape, GlobalMaxPool2D
 from keras.models import Model, load_model
+from tensorflow.keras.optimizers import Adam
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 import numpy as np
 from sklearn.metrics import classification_report, accuracy_score
@@ -80,7 +81,8 @@ class CNN:
         # Build the model
         model_CNN = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        model_CNN.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        opt = Adam(learning_rate=0.0001)
+        model_CNN.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         model_CNN.summary()
         
         plot_model(model_CNN, to_file=PATH + MODEL_IMAGE + CNN_IMAGE, show_shapes=True, show_layer_names=True)
