@@ -81,7 +81,7 @@ class CNN:
         # Build the model
         model_CNN = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        opt = Adam(learning_rate=0.0001)
+        opt = Adam(learning_rate=0.00001)
         model_CNN.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         model_CNN.summary()
         
