@@ -1,9 +1,9 @@
 from keras.layers import Input, Bidirectional, LSTM, Dense, Dropout
 from keras.models import Model, load_model
-from tensorflow.keras.layers import Embedding, Average, Concatenate
-from keras.layers import concatenate
+from tensorflow.keras.layers import Embedding, Average
+from tensorflow.keras.optimizers import Adam
 from sklearn.metrics import classification_report, accuracy_score
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras import utils
 import numpy as np
 import tensorflow as tf
@@ -55,7 +55,6 @@ class BiLSTM:
         average = Average()([title_lstm, text_lstm])
 
         final = Dense(256, activation='relu')(average)
-        # final = Dropout(DROP)(final)
 
         return Dense(3, activation='softmax')(final)
 
@@ -63,7 +62,8 @@ class BiLSTM:
         # Build the model
         model_BiLSTM = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        model_BiLSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        opt = Adam(learning_rate=0.00001)
+        model_BiLSTM.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         model_BiLSTM.summary()
 
         plot_model(model_BiLSTM, to_file=PATH + MODEL_IMAGE + BILSTM_IMAGE, show_shapes=True, show_layer_names=True)

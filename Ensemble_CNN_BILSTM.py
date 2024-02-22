@@ -20,7 +20,9 @@ class CNN_BILSTM:
             val_title,
             val_text,
             val_rating,
-            vocab_size
+            vocab_size,
+            bilstm,
+            cnn
     ):
         self.title_input = None
         self.text_input = None
@@ -31,6 +33,8 @@ class CNN_BILSTM:
         self.val_text = val_text
         self.val_rating = val_rating
         self.vocab_size = vocab_size
+        self.bilstm = bilstm
+        self.cnn = cnn
         self.output = self.getOutput()
         self.model = self.buildModel()
 
@@ -39,14 +43,11 @@ class CNN_BILSTM:
         self.title_input = Input(shape=(self.train_title.shape[1],))
         self.text_input = Input(shape=(self.train_text.shape[1],))
 
-        cnn = load_model(PATH + MODEL + CNN_MODEL)
-        bilstm = load_model(PATH + MODEL + BILSTM_MODEL)
-
         # Get the predictions from the BiLSTM model
-        lstm_predictions = bilstm([self.title_input, self.text_input])
+        lstm_predictions = self.bilstm([self.title_input, self.text_input])
 
         # Get the predictions from the CNN model
-        cnn_predictions = cnn([self.title_input, self.text_input])
+        cnn_predictions = self.cnn([self.title_input, self.text_input])
 
         # Average predictions
         average_predictions = Average()([lstm_predictions, cnn_predictions])
@@ -61,7 +62,7 @@ class CNN_BILSTM:
         # Build the model
         cnn_bilstm_model = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        opt = Adam(learning_rate=0.0001)
+        opt = Adam(learning_rate=0.00001)
         cnn_bilstm_model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         cnn_bilstm_model.summary()
 
