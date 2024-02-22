@@ -8,9 +8,7 @@ from tensorflow.keras import utils
 import numpy as np
 import tensorflow as tf
 from constants import *
-from keras import backend as K
 from keras.utils import plot_model
-from keras.callbacks import Callback
 import matplotlib.pyplot as plt
 
 
@@ -42,7 +40,7 @@ class BiLSTM:
 
     def getOutput(self):
         hidden_size = 256
-        DROP = 0.5
+        DROP = 0.3
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], weights=[self.embedding_matrix], trainable=TRAINABLE)(self.title_input)
@@ -56,8 +54,8 @@ class BiLSTM:
 
         average = Average()([title_lstm, text_lstm])
 
-        final = Dense(256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001))(average)
-        final = Dropout(DROP)(final)
+        final = Dense(256, activation='relu')(average)
+        # final = Dropout(DROP)(final)
 
         return Dense(3, activation='softmax')(final)
 
@@ -75,7 +73,6 @@ class BiLSTM:
     def trainModel(self):
         early_stopping = EarlyStopping(monitor='val_accuracy', patience=STOP_PATIENCE, verbose=0, mode='max')
         checkpoint = ModelCheckpoint(PATH + MODEL + BILSTM_MODEL, save_best_only=True, monitor='val_loss', mode='min')
-        gradient_callback = PrintGradientCallback(self.model)
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
@@ -83,7 +80,7 @@ class BiLSTM:
             batch_size=BATCH_SIZE,
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
-            callbacks=[early_stopping, checkpoint, gradient_callback]
+            callbacks=[early_stopping, checkpoint]
         )
 
         # self.model.save(PATH + MODEL + BILSTM_MODEL)
@@ -115,15 +112,3 @@ class BiLSTM:
             print(report, file=file)
 
         print(f"Classification report saved to {PATH + REPORT + BILSTM_REPORT}..................")
-
-
-class PrintGradientCallback(Callback):
-
-    def __init__(self, model):
-        self.model = model
-
-    def on_epoch_end(self, epoch, logs=None):
-        
-        gradients = K.gradients(self.model.total_loss, self.model.trainable_weights)
-        mean_grad = K.mean(K.stack([K.mean(grad) for grad in gradients]))
-        print("Epoch {}: Mean Gradient = {}".format(epoch + 1, mean_grad))
