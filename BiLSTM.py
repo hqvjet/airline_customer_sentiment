@@ -8,7 +8,9 @@ from tensorflow.keras import utils
 import numpy as np
 import tensorflow as tf
 from constants import *
+from keras import backend as K
 from keras.utils import plot_model
+from keras.callbacks import Callback
 import matplotlib.pyplot as plt
 
 
@@ -40,7 +42,7 @@ class BiLSTM:
 
     def getOutput(self):
         hidden_size = 256
-        DROP = 0.3
+        DROP = 0.5
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], weights=[self.embedding_matrix], trainable=TRAINABLE)(self.title_input)
@@ -54,7 +56,7 @@ class BiLSTM:
 
         average = Average()([title_lstm, text_lstm])
 
-        final = Dense(200, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001))(average)
+        final = Dense(256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001))(average)
         final = Dropout(DROP)(final)
 
         return Dense(3, activation='softmax')(final)
@@ -112,3 +114,12 @@ class BiLSTM:
             print(report, file=file)
 
         print(f"Classification report saved to {PATH + REPORT + BILSTM_REPORT}..................")
+
+
+class PrintGradientCallback(Callback):
+
+  def on_epoch_end(self, epoch, logs=None):
+    
+    gradients = K.gradients(self.model.total_loss, self.model.trainable_weights)
+    mean_grad = K.mean(K.stack([K.mean(grad) for grad in gradients]))
+    print("Epoch {}: Mean Gradient = {}".format(epoch + 1, mean_grad))
