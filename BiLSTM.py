@@ -75,7 +75,7 @@ class BiLSTM:
     def trainModel(self):
         early_stopping = EarlyStopping(monitor='val_accuracy', patience=STOP_PATIENCE, verbose=0, mode='max')
         checkpoint = ModelCheckpoint(PATH + MODEL + BILSTM_MODEL, save_best_only=True, monitor='val_loss', mode='min')
-        gradient_callback = PrintGradientCallback()
+        gradient_callback = PrintGradientCallback(self.model)
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
@@ -119,8 +119,11 @@ class BiLSTM:
 
 class PrintGradientCallback(Callback):
 
-  def on_epoch_end(self, epoch, logs=None):
-    
-    gradients = K.gradients(self.model.total_loss, self.model.trainable_weights)
-    mean_grad = K.mean(K.stack([K.mean(grad) for grad in gradients]))
-    print("Epoch {}: Mean Gradient = {}".format(epoch + 1, mean_grad))
+    def __init__(self, model):
+        self.model = model
+
+    def on_epoch_end(self, epoch, logs=None):
+        
+        gradients = K.gradients(self.model.total_loss, self.model.trainable_weights)
+        mean_grad = K.mean(K.stack([K.mean(grad) for grad in gradients]))
+        print("Epoch {}: Mean Gradient = {}".format(epoch + 1, mean_grad))
