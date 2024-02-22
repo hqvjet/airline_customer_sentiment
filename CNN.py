@@ -1,8 +1,8 @@
 from keras.layers import Input, Embedding, Conv2D, MaxPool2D, Flatten, Dense, Concatenate, Dropout, Average, Reshape
-from keras.models import Model
+from keras.models import Model, load_model
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 import numpy as np
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score
 from constants import *
 from tensorflow.keras import utils
 from keras.utils import plot_model
@@ -36,7 +36,7 @@ class CNN:
 
     def getOutput(self):
         # Input for title
-        num_filters = 128
+        num_filters = 256
         filter_sizes = [3, 4, 5]
         DROP = 0.3
         
@@ -72,9 +72,9 @@ class CNN:
         average = Average()([title_drop, text_drop])
 
         # Additional layers of the model
-        # dense1 = Dense(512, activation='relu')(average)
+        dense1 = Dense(256, activation='relu')(average)
 
-        return Dense(3, activation='softmax')(average)
+        return Dense(3, activation='softmax')(dense1)
 
     def buildModel(self):
         # Build the model
@@ -89,8 +89,7 @@ class CNN:
 
     def trainModel(self):
         early_stopping = EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
-        checkpoint = ModelCheckpoint(PATH + MODEL + CNN_MODEL, save_best_only=True, monitor='val_loss', mode='min')
-        reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=7, verbose=1, epsilon=1e-4, mode='min')
+        checkpoint = ModelCheckpoint(PATH + MODEL + CNN_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
@@ -98,7 +97,7 @@ class CNN:
             batch_size=BATCH_SIZE,
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
-            callbacks=[early_stopping, checkpoint, reduce_lr_loss]
+            callbacks=[early_stopping, checkpoint]
         )
 
         # self.model.save(PATH + MODEL + CNN_MODEL)
@@ -116,9 +115,13 @@ class CNN:
         return self.model
     
     def testModel(self, x_test, y_test):
+        self.model = load_model(PATH + MODEL + CNN_MODEL)
         y_pred = self.model.predict(x_test)
-        pred = np.argmax(y_pred,axis=1)
+        pred = np.argmax(y_pred, axis=1)
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
+        acc = accuracy_score(y_test, utils.to_categorical(pred, num_classes=3))
+        acc_line = f'Accuracy: {acc}\n'
+        report += acc_line
         print(report)
 
         with open(PATH + REPORT + CNN_REPORT, 'w') as file:
