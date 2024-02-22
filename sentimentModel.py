@@ -77,8 +77,7 @@ def startLearning():
     title_val_ids,
     text_val_ids,
     val_labels,
-    vocab_size,
-    emb_mat
+    vocab_size
   )
 
   cnn_bilstm.trainModel()
