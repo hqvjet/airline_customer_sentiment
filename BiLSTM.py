@@ -75,6 +75,7 @@ class BiLSTM:
     def trainModel(self):
         early_stopping = EarlyStopping(monitor='val_accuracy', patience=STOP_PATIENCE, verbose=0, mode='max')
         checkpoint = ModelCheckpoint(PATH + MODEL + BILSTM_MODEL, save_best_only=True, monitor='val_loss', mode='min')
+        gradient_callback = PrintGradientCallback()
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
@@ -82,7 +83,7 @@ class BiLSTM:
             batch_size=BATCH_SIZE,
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
-            callbacks=[early_stopping, checkpoint]
+            callbacks=[early_stopping, checkpoint, gradient_callback]
         )
 
         # self.model.save(PATH + MODEL + BILSTM_MODEL)
