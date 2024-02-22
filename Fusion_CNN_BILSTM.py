@@ -35,28 +35,10 @@ class CNN_BILSTM:
         self.model = self.buildModel()
 
     def getOutput(self):
-    #   # Define input layers for the title and text inputs
-    #   self.title_input = Input(shape=(self.train_title.shape[1],))
-    #   self.text_input = Input(shape=(self.train_text.shape[1],))
-
-    #   # Get the predictions from the BiLSTM model
-    #   lstm_predictions = self.bilstm_model([self.title_input, self.text_input])
-
-    #   # Get the predictions from the CNN model
-    #   cnn_predictions = self.cnn_model([self.title_input, self.text_input])
-
-    #   # Average predictions
-    #   average_predictions = Average()([lstm_predictions, cnn_predictions])
-
-    #   # Add a dense layer
-    #   dense_layer = Dense(EMBEDDING_DIM, activation='relu')(average_predictions)
-
-    #   # Add another dense layer for the final output
-    #   return Dense(3, activation='softmax')(dense_layer)
         # Define input layers for the title and text inputs
         hidden_size = 256
         DROP = 0.3
-        num_filters = 128
+        num_filters = 256
         filter_sizes = [3, 4, 5]
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
@@ -99,7 +81,7 @@ class CNN_BILSTM:
         cnn_bilstm_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         cnn_bilstm_model.summary()
 
-        plot_model(cnn_bilstm_model, to_file=PATH + MODEL_IMAGE + CNN_BILSTM_IMAGE, show_shapes=True, show_layer_names=True)
+        plot_model(cnn_bilstm_model, to_file=PATH + MODEL_IMAGE + FUSION_CNN_BILSTM_IMAGE, show_shapes=True, show_layer_names=True)
 
         return cnn_bilstm_model
 
@@ -113,7 +95,7 @@ class CNN_BILSTM:
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
         )
 
-        self.model.save(PATH + MODEL + CNN_BILSTM_MODEL)
+        self.model.save(PATH + MODEL + FUSION_CNN_BILSTM_MODEL)
 
         plt.figure()
         plt.plot(history.history['accuracy'], label='Train Accuracy')
@@ -122,7 +104,7 @@ class CNN_BILSTM:
         plt.ylabel('Value')
         plt.xlabel('Epoch')
         plt.legend()
-        plt.savefig(PATH + CHART + CNN_BILSTM_CHART)
+        plt.savefig(PATH + CHART + FUSION_CNN_BILSTM_CHART)
         plt.close()
     
     def testModel(self, x_test, y_test):
@@ -131,7 +113,7 @@ class CNN_BILSTM:
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
         print(report)
 
-        with open(PATH + CNN_BILSTM_REPORT, 'w') as file:
+        with open(PATH + FUSION_CNN_BILSTM_REPORT, 'w') as file:
             print(report, file=file)
 
-        print(f"Classification report saved to {PATH + CNN_BILSTM_REPORT}..................")
+        print(f"Classification report saved to {PATH + FUSION_CNN_BILSTM_REPORT}..................")

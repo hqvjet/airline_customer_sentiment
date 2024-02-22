@@ -5,7 +5,8 @@ from BiLSTM import BiLSTM
 from LSTM import LSTM
 from CNN import CNN
 from gloveEmbedding import usingGlove, getEmbeddingMatrix
-from CNN_BILSTM import CNN_BILSTM
+from Ensemble_CNN_BILSTM import CNN_BILSTM as En_CNN_BILSTM
+from Fusion_CNN_BILSTM import CNN_BILSTM as Fu_CNN_BILSTM
 
 # Dataset Prepare
 title_train_ids, text_train_ids, train_labels, title_val_ids, text_val_ids, val_labels, title_test_ids, text_test_ids, test_labels, tokenizer = usingGlove()
@@ -32,23 +33,23 @@ def startLearning():
   #   np.array(test_labels)
   # )
   
-  print('TRAINING USING CNN MODEL.......................')
-  cnn = CNN(
-    title_train_ids,
-    text_train_ids,
-    train_labels,
-    title_val_ids,
-    text_val_ids,
-    val_labels,
-    vocab_size,
-    emb_mat
-  )
+  # print('TRAINING USING CNN MODEL.......................')
+  # cnn = CNN(
+  #   title_train_ids,
+  #   text_train_ids,
+  #   train_labels,
+  #   title_val_ids,
+  #   text_val_ids,
+  #   val_labels,
+  #   vocab_size,
+  #   emb_mat
+  # )
 
-  cnn_model = cnn.trainModel()
-  cnn.testModel(
-    [np.array(title_test_ids), np.array(text_test_ids)], 
-    np.array(test_labels)
-  )
+  # cnn_model = cnn.trainModel()
+  # cnn.testModel(
+  #   [np.array(title_test_ids), np.array(text_test_ids)], 
+  #   np.array(test_labels)
+  # )
   
   # print('TRAINING USING BiLSTM MODEL......................')
   # bilstm = BiLSTM(
@@ -68,22 +69,22 @@ def startLearning():
   #   np.array(test_labels)
   # )
   
-  # print('TRAINING USING CNN + BiLSTM MODEL.................')
-  # cnn_bilstm = CNN_BILSTM(
-  #   title_train_ids,
-  #   text_train_ids,
-  #   train_labels,
-  #   title_val_ids,
-  #   text_val_ids,
-  #   val_labels,
-  #   vocab_size,
-  #   emb_mat
-  # )
+  print('TRAINING USING ENSEMBLE CNN + BiLSTM MODEL.................')
+  cnn_bilstm = En_CNN_BILSTM(
+    title_train_ids,
+    text_train_ids,
+    train_labels,
+    title_val_ids,
+    text_val_ids,
+    val_labels,
+    vocab_size,
+    emb_mat
+  )
 
-  # cnn_bilstm.trainModel()
-  # cnn_bilstm.testModel(
-  #   [np.array(title_test_ids), np.array(text_test_ids)], 
-  #   np.array(test_labels)
-  # )
+  cnn_bilstm.trainModel()
+  cnn_bilstm.testModel(
+    [np.array(title_test_ids), np.array(text_test_ids)], 
+    np.array(test_labels)
+  )
 
   print('TRAINING DONE.............................')
