@@ -73,9 +73,9 @@ class CNN:
         average = Average()([title_drop, text_drop])
 
         # Additional layers of the model
-        dense = Dense(256, activation='relu')(average)
-        dense = Dense(128, activation='relu')(dense)
-        dense = Dense(32, activation='relu')(dense)
+        # dense = Dense(256, activation='relu')(average)
+        dense = Dense(128, activation='relu')(average)
+        dense = Dense(64, activation='relu')(dense)
 
         return Dense(3, activation='softmax')(dense)
 
