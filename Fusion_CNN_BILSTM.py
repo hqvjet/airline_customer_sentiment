@@ -72,7 +72,9 @@ class CNN_BILSTM:
 
         average = Average()([title_drop, text_drop])
 
-        return Dense(3, activation='softmax')(average)
+        dense1 = Dense(256, activation='relu')(average)
+
+        return Dense(3, activation='softmax')(dense1)
 
     def buildModel(self):
         # Build the model
