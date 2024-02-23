@@ -1,7 +1,9 @@
 from keras.layers import Input, Embedding, Conv2D, MaxPool2D, Flatten, Dense, Concatenate, Average, Bidirectional, LSTM, Reshape, Dropout
-from keras.models import Model
+from keras.models import Model, load_model
+from tensorflow.keras.optimizers import Adam
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 import numpy as np
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score
 from constants import *
 from tensorflow.keras import utils
 from keras.utils import plot_model
@@ -80,7 +82,8 @@ class CNN_BILSTM:
         # Build the model
         cnn_bilstm_model = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        cnn_bilstm_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        opt = Adam(learning_rate=0.00001)
+        cnn_bilstm_model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         cnn_bilstm_model.summary()
 
         plot_model(cnn_bilstm_model, to_file=PATH + MODEL_IMAGE + FUSION_CNN_BILSTM_IMAGE, show_shapes=True, show_layer_names=True)
@@ -88,6 +91,8 @@ class CNN_BILSTM:
         return cnn_bilstm_model
 
     def trainModel(self):
+        early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min')
+        checkpoint = ModelCheckpoint(PATH + MODEL + FUSION_CNN_BILSTM_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
@@ -95,14 +100,15 @@ class CNN_BILSTM:
             batch_size=BATCH_SIZE,
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
+            callbacks=[early_stopping, checkpoint]
         )
 
-        self.model.save(PATH + MODEL + FUSION_CNN_BILSTM_MODEL)
+        # self.model.save(PATH + MODEL + FUSION_CNN_BILSTM_MODEL)
 
         plt.figure()
         plt.plot(history.history['accuracy'], label='Train Accuracy')
         plt.plot(history.history['loss'], label='Train Loss')
-        plt.title('CNN + BiLSTM Model')
+        plt.title('Fusion CNN + BiLSTM Model')
         plt.ylabel('Value')
         plt.xlabel('Epoch')
         plt.legend()
@@ -110,12 +116,16 @@ class CNN_BILSTM:
         plt.close()
     
     def testModel(self, x_test, y_test):
+        self.model = load_model(PATH + MODEL + FUSION_CNN_BILSTM_MODEL)
         y_pred = self.model.predict(x_test)
-        pred = np.argmax(y_pred,axis=1)
+        pred = np.argmax(y_pred, axis=1)
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
+        acc = accuracy_score(y_test, utils.to_categorical(pred, num_classes=3))
+        acc_line = f'Accuracy: {acc}\n'
+        report += acc_line
         print(report)
 
-        with open(PATH + FUSION_CNN_BILSTM_REPORT, 'w') as file:
+        with open(PATH + REPORT + FUSION_CNN_BILSTM_REPORT, 'w') as file:
             print(report, file=file)
 
-        print(f"Classification report saved to {PATH + FUSION_CNN_BILSTM_REPORT}..................")
+        print(f"Classification report saved to {PATH + REPORT + FUSION_CNN_BILSTM_REPORT}..................")
