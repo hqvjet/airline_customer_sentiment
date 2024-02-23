@@ -90,7 +90,7 @@ class CNN:
         return model_CNN
 
     def trainModel(self):
-        early_stopping = EarlyStopping(monitor='val_accuracy', patience=STOP_PATIENCE, verbose=0, mode='min')
+        early_stopping = EarlyStopping(monitor='val_accuracy', patience=STOP_PATIENCE, verbose=0, mode='max')
         checkpoint = ModelCheckpoint(PATH + MODEL + CNN_MODEL, save_best_only=True, monitor='val_accuracy', mode='max', verbose=1)
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
