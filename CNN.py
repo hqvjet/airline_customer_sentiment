@@ -38,7 +38,7 @@ class CNN:
     def getOutput(self):
         # Input for title
         num_filters = 256
-        filter_sizes = [3, 4, 5]
+        filter_sizes = [3, 4, 5, 6]
         DROP = 0.3
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
@@ -73,7 +73,7 @@ class CNN:
         average = Average()([title_drop, text_drop])
 
         # Additional layers of the model
-        dense1 = Dense(256, activation='relu')(average)
+        dense1 = Dense(512, activation='relu')(average)
 
         return Dense(3, activation='softmax')(dense1)
 
