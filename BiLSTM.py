@@ -55,6 +55,8 @@ class BiLSTM:
         average = Average()([title_lstm, text_lstm])
 
         final = Dense(256, activation='relu')(average)
+        final = Dense(128, activation='relu')(final)
+        final = Dense(64, activation='relu')(final)
 
         return Dense(3, activation='softmax')(final)
 
@@ -71,7 +73,7 @@ class BiLSTM:
         return model_BiLSTM
 
     def trainModel(self):
-        early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min')
+        early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=1, mode='min')
         checkpoint = ModelCheckpoint(PATH + MODEL + BILSTM_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],

@@ -54,6 +54,8 @@ class CNN_BILSTM:
 
         # Add a dense layer
         dense_layer = Dense(256, activation='relu')(average_predictions)
+        dense_layer = Dense(128, activation='relu')(dense_layer)
+        dense_layer = Dense(64, activation='relu')(dense_layer)
 
         # Add another dense layer for the final output
         return Dense(3, activation='softmax')(dense_layer)
@@ -71,7 +73,7 @@ class CNN_BILSTM:
         return cnn_bilstm_model
 
     def trainModel(self):
-        early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min')
+        early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=1, mode='min')
         checkpoint = ModelCheckpoint(PATH + MODEL + ENSEMBLE_CNN_BILSTM_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
