@@ -89,7 +89,7 @@ def startLearning():
   # )
 
   print('TRAINING USING FUSION CNN + BiLSTM MODEL.................')
-  cnn_bilstm = En_CNN_BILSTM(
+  cnn_bilstm = Fu_CNN_BILSTM(
     title_train_ids,
     text_train_ids,
     train_labels,
