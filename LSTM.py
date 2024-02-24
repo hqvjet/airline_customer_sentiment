@@ -1,10 +1,10 @@
 from keras.models import Model, load_model
-from keras import regularizers
 from tensorflow.keras.layers import Embedding
-from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, concatenate, Average
+from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, Average
 from tensorflow.keras import utils
 from sklearn.metrics import classification_report, accuracy_score
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.optimizers import Adam
 import numpy as np
 from constants import *
 from keras.utils import plot_model
@@ -54,8 +54,8 @@ class LSTM:
 
         average = Average()([title_lstm, text_lstm])
 
-        final = Dense(200, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001))(average)
-        final = Dropout(DROP)(final)
+        final = Dense(128, activation='relu')(average)
+        final = Dense(64, activation='relu')(final)
 
         return Dense(3, activation='softmax')(final)
 
@@ -64,7 +64,8 @@ class LSTM:
         # Xây dựng mô hình
         model_LSTM = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        model_LSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        opt = Adam(learning_rate=0.00001)
+        model_LSTM.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         model_LSTM.summary()
         
         plot_model(model_LSTM, to_file=PATH + MODEL_IMAGE + LSTM_IMAGE, show_shapes=True, show_layer_names=True)

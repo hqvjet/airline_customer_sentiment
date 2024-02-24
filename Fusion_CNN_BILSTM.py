@@ -41,7 +41,7 @@ class CNN_BILSTM:
         hidden_size = 256
         DROP = 0.3
         num_filters = 256
-        filter_sizes = [3, 4, 5]
+        filter_sizes = [3, 4, 5, 6]
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
         self.text_input = Input(shape=(self.train_text.shape[1],))
@@ -74,7 +74,8 @@ class CNN_BILSTM:
 
         average = Average()([title_drop, text_drop])
 
-        dense1 = Dense(256, activation='relu')(average)
+        dense1 = Dense(128, activation='relu')(average)
+        dense1 = Dense(64, activation='relu')(dense1)
 
         return Dense(3, activation='softmax')(dense1)
 
