@@ -53,8 +53,8 @@ class CNN_BILSTM:
         average_predictions = Average()([lstm_predictions, cnn_predictions])
 
         # Add a dense layer
-        dense_layer = Dense(256, activation='relu')(average_predictions)
-        dense_layer = Dense(128, activation='relu')(dense_layer)
+        # dense_layer = Dense(256, activation='relu')(average_predictions)
+        dense_layer = Dense(128, activation='relu')(average_predictions)
         dense_layer = Dense(64, activation='relu')(dense_layer)
 
         # Add another dense layer for the final output
