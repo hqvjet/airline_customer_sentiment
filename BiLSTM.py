@@ -54,8 +54,8 @@ class BiLSTM:
 
         average = Average()([title_lstm, text_lstm])
 
-        final = Dense(256, activation='relu')(average)
-        final = Dense(128, activation='relu')(final)
+        # final = Dense(256, activation='relu')(average)
+        final = Dense(128, activation='relu')(average)
         final = Dense(64, activation='relu')(final)
 
         return Dense(3, activation='softmax')(final)
