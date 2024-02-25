@@ -1,4 +1,4 @@
-from keras.layers import Input, Bidirectional, LSTM, Dense, Dropout
+from keras.layers import Input, Bidirectional, LSTM, Dense, Dropout, MaxPooling1D
 from keras.models import Model, load_model
 from tensorflow.keras.layers import Embedding, Average
 from tensorflow.keras.optimizers import Adam
@@ -44,13 +44,17 @@ class BiLSTM:
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], weights=[self.embedding_matrix], trainable=TRAINABLE)(self.title_input)
-        title_lstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(title_embedding)
-        title_lstm = Dropout(DROP)(title_lstm)
+        title_lstm = Bidirectional(LSTM(hidden_size, activation='tanh', return_sequences=True))(title_embedding)
+        title_pooling = MaxPooling1D()(title_lstm)
+        title_lstm = Dropout(DROP)(title_pooling)
 
         self.text_input = Input(shape=(self.train_text.shape[1],))
         text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], weights=[self.embedding_matrix], trainable=TRAINABLE)(self.text_input)
-        text_lstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(text_embedding)
-        text_lstm = Dropout(DROP)(text_lstm)
+        text_lstm = Bidirectional(LSTM(hidden_size, activation = 'tanh', return_sequences=True))(text_embedding)
+        text_pooling = MaxPooling1D()(text_lstm)
+        text_lstm = Dropout(DROP)(text_pooling)
+
+        # Global Max Pooling layer for text
 
         average = Average()([title_lstm, text_lstm])
 
