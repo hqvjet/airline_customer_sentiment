@@ -1,0 +1,5 @@
+{
+    "dataworkspace.excludedProjects": [
+        "server/airline sentiment comment/airline sentiment comment.sqlproj"
+    ]
+}
