@@ -1,3 +1,5 @@
 __pycache__
 resources/glove/models
 resources/glove/trash
+resources/vncorenlp
+resources/PhoBERT_large_transformers
