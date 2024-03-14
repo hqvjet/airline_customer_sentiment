@@ -14,7 +14,7 @@ def using_cnn():
     return jsonify(res)
 
 @glove.post('/lstm')
-def using_cnn():
+def using_lstm():
     req = request.get_json()
     title = req.get('title')
     content = req.get('content')
@@ -24,7 +24,7 @@ def using_cnn():
     return jsonify(res)
 
 @glove.post('/bilstm')
-def using_cnn():
+def using_bilstm():
     req = request.get_json()
     title = req.get('title')
     content = req.get('content')
@@ -34,7 +34,7 @@ def using_cnn():
     return jsonify(res)
 
 @glove.post('/ensemble')
-def using_cnn():
+def using_ensemble_cnn_bilstm():
     req = request.get_json()
     title = req.get('title')
     content = req.get('content')
@@ -44,7 +44,7 @@ def using_cnn():
     return jsonify(res)
 
 @glove.post('/fusion')
-def using_cnn():
+def using_fusion_cnn_bilstm():
     req = request.get_json()
     title = req.get('title')
     content = req.get('content')
