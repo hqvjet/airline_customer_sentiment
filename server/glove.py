@@ -9,9 +9,9 @@ def using_cnn():
     title = req.get('title')
     content = req.get('content')
 
-    res = getRatingFromModel(title, content, 'CNN_MODEL.keras')
+    res = getRatingFromModel(title, content, 'CNN_MODEL.keras').tolist()
 
-    return jsonify(res)
+    return jsonify({'prediction': res})
 
 @glove.post('/lstm')
 def using_lstm():
