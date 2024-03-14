@@ -9,6 +9,7 @@ glove_lstm = getModel(GLOVE_PATH + 'LSTM_MODEL.keras')
 glove_bilstm = getModel(GLOVE_PATH + 'BILSTM_MODEL.keras')
 glove_ensemble = getModel(GLOVE_PATH + 'ENSEMBLE_CNN_BILSTM_MODEL.keras')
 glove_fusion = getModel(GLOVE_PATH + 'FUSION_CNN_BILSTM_MODEL.keras')
+print('LOADING MODEL DONE ....................')
 
 def getRatingFromModel(title, content, model_name):
     title_ids = getIDS(title)

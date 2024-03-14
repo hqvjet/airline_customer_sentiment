@@ -1,10 +1,5 @@
-from glove import Corpus, Glove
-import pandas as pd
-import numpy as np
-from tensorflow.keras import utils
 from vncorenlp import VnCoreNLP
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.preprocessing.text import Tokenizer
 import pickle as pkl
 
 rdr = VnCoreNLP('../glove/resources/' + "vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
