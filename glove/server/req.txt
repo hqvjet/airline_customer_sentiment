@@ -1,5 +1,0 @@
-mysql-connector-python
-flask
-'flask[async]'
-httpx
-flask_cors

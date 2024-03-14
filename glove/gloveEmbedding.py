@@ -26,7 +26,7 @@ def getEmbeddingMatrix(tokenizer, vocab_size):
     if emb_vector is not None:
       emb_matrix[index] = emb_vector
 
-  return emb_matrix, emb_dict
+  return emb_matrix
 
 def getDataIDS(sentences, tokenizer):
   ids = tokenizer.texts_to_sequences(sentences)
@@ -78,6 +78,8 @@ def usingGlove():
   tokenizer.fit_on_texts(text_val)
   tokenizer.fit_on_texts(title_test)
   tokenizer.fit_on_texts(text_test)
+
+  tokenizer.save(PATH + MODEL + TOKENIZER_MODEL)
 
   title_train_ids, text_train_ids = prepareData(title_train, text_train, tokenizer)
   title_val_ids, text_val_ids = prepareData(title_val, text_val, tokenizer)

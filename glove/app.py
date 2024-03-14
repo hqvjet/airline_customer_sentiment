@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from appService import getRatingFromModel
+from server.appService import getRatingFromModel
 from Nomarlize import arrayToStatus
 
 app = Flask(__name__)
