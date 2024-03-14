@@ -6,6 +6,7 @@ from vncorenlp import VnCoreNLP
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
 from sklearn.model_selection import train_test_split
+import pickle as pkl
 
 from constants import *
 from Nomarlize import normalizeSentence
@@ -79,7 +80,8 @@ def usingGlove():
   tokenizer.fit_on_texts(title_test)
   tokenizer.fit_on_texts(text_test)
 
-  tokenizer.save(PATH + MODEL + TOKENIZER_MODEL)
+  with open('tokenizer.pkl', 'wb') as pkl_file:
+    pkl.dump(tokenizer, pkl_file)
 
   title_train_ids, text_train_ids = prepareData(title_train, text_train, tokenizer)
   title_val_ids, text_val_ids = prepareData(title_val, text_val, tokenizer)
