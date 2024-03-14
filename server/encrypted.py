@@ -3,6 +3,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 import pickle as pkl
 import re
 import pandas as pd
+import numpy as np
 
 rdr = VnCoreNLP('../glove/resources/' + "vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
 with open('../glove/resources/glove/models/' + 'TOKENIZER.pkl', 'rb') as pkl_file:
@@ -24,10 +25,10 @@ def normalizeSentence(sentence):
     return sentence.lower().strip()
 
 def getIDS(text):
-    text = normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(text)))
+    text = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(text)))]
     print(text)
 
-    ids = tokenizer.texts_to_sequences(text)
+    ids = tokenizer.texts_to_sequences(np.array(text))
     ids = pad_sequences(ids, padding='post', maxlen=200)
 
     return ids
