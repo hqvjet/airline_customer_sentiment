@@ -5,9 +5,11 @@ from tensorflow.keras import utils
 from vncorenlp import VnCoreNLP
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
+import pickle as pkl
 
 rdr = VnCoreNLP('../glove/resources/' + "vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
-tokenizer = Tokenizer().load('../glove/resources/glove/models/tokenizer.keras')
+with open('../glove/resources/glove/models/' + 'TOKENIZER.pkl', 'rb') as pkl_file:
+    tokenizer = pkl.load(pkl_file)
 
 def getIDS(text):
     text = ' '.join(rdr.tokenize(text))

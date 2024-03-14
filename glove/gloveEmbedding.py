@@ -80,7 +80,7 @@ def usingGlove():
   tokenizer.fit_on_texts(title_test)
   tokenizer.fit_on_texts(text_test)
 
-  with open('tokenizer.pkl', 'wb') as pkl_file:
+  with open(PATH + MODEL + TOKENIZER_MODEL, 'wb') as pkl_file:
     pkl.dump(tokenizer, pkl_file)
 
   title_train_ids, text_train_ids = prepareData(title_train, text_train, tokenizer)

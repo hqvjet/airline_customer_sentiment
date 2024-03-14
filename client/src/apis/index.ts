@@ -3,12 +3,12 @@ import { usingGLOVE } from './glove'
 import { usingPHOBERT } from './phobert'
 
 export const GLOVE_CONFIG = axios.create({
-    baseURL: process.env.SERVER_API + '/glove',
+    baseURL: process.env.NEXT_PUBLIC_API_URL + '/glove',
     timeout: 10000
 })
 
 export const PHOBERT_CONFIG = axios.create({
-    baseURL: process.env.SERVER_API + '/phobert',
+    baseURL: process.env.NEXT_PUBLIC_API_URL + '/phobert',
     timeout: 10000
 })
 
@@ -18,7 +18,7 @@ export default function useAPI(path: string) {
     const model = paths[3]
 
     if (emb == 'glove') {
-        if (model == 'cnn') 
+        if (model == 'cnn')
             return usingGLOVE.usingCNN
         else if (model == 'lstm')
             return usingGLOVE.usingLSTM
