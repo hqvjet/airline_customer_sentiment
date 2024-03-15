@@ -2,11 +2,12 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 from glove import glove
+from phobert import phobert
 
 app = Flask(__name__)
 CORS(app)
 
-# app.register_blueprint(airlines)
+app.register_blueprint(phobert)
 app.register_blueprint(glove)
 
 if __name__ == "__main__":
