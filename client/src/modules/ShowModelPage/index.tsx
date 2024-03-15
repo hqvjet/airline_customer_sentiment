@@ -1,8 +1,10 @@
 'use client'
-import { Col, Form, Input, Button, Space, Card, Typography, FormProps, message } from "antd"
+import { Col, Row, Form, Input, Button, Space, Card, Typography, FormProps, message } from "antd"
 import { MdOutlineTitle } from "react-icons/md"
 import { usePathname } from 'next/navigation'
 import useAPI from "@/apis"
+import { useState } from "react"
+import { getSentiment } from "@/constants/utils"
 
 const { Title, Text } = Typography
 const { TextArea } = Input
@@ -14,19 +16,27 @@ type Comment = {
 
 export default function ShowModelPage() {
     const path = usePathname()
+    const [prediction, setPrediction] = useState<Array<number>>([])
+    const [sentiment, setSentiment] = useState<string>('')
 
     const onFinishForm: FormProps<Comment>['onFinish'] = (values: any) => {
         const apiFunction = useAPI(path);
-        console.log(values)
 
         if (apiFunction !== null) {
             apiFunction(values.title, values.content)
                 .then((response: any) => {
-                    console.log(response)
+                    const array = []
+                    for (var i = 0; i < response.data.prediction[0].length; i += 1) {
+                        array.push(response.data.prediction[0][i].toFixed(4))
+                    }
+
+                    setPrediction(array)
+                    setSentiment(getSentiment(response.data.prediction[0]))
+                    message.success('Post Successful!')
                 })
                 .catch((error: any) => {
                     console.log(error)
-                });
+                })
         } else {
             message.error("URL error");
         }
@@ -78,8 +88,18 @@ export default function ShowModelPage() {
                             </Button>
                         </Form.Item>
                     </Form>
+                    <Row justify={'center'} align={'middle'}>
+                        <Title><p className={`${sentiment == 'Negative' ? 'text-red-500' : sentiment == 'Neutral' ? 'text-yellow-300' : 'text-green-400'}`}>{sentiment}</p></Title>
+                    </Row>
                 </Col>
             </Card>
+            <Row justify={'center'} align={'middle'}>
+                <Col className="w-2/3">
+                    <Title level={3}><p className="text-white">Negative: {prediction[0]}</p></Title>
+                    <Title level={3}><p className="text-white">Neutral: {prediction[1]}</p></Title>
+                    <Title level={3}><p className="text-white">Positive: {prediction[2]}</p></Title>
+                </Col>
+            </Row>
         </Space>
     )
 }

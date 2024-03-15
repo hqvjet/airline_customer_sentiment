@@ -15,7 +15,6 @@ from fairseq.data import Dictionary
 import argparse
 import pandas as pd
 import torch
-
 from constants import *
 from Nomarlize import normalizeSentence, statusToNumber
 

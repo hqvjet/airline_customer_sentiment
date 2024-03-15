@@ -1,0 +1,11 @@
+GLOVE_PATH = '../glove/resources/glove/models/'
+PHOBERT_PATH = '../phobert/resources/phobert/models/'
+
+CNN_MODEL = 'CNN_MODEL.keras'
+LSTM_MODEL = 'LSTM_MODEL.keras'
+BILSTM_MODEL = 'BILSTM_MODEL.keras'
+ENSEMBLE_CNN_BILSTM = 'ENSEMBLE_CNN_BILSTM_MODEL.keras'
+FUSION_CNN_BILSTM = 'FUSION_CNN_BILSTM_MODEL.keras'
+
+GLOVE_METHOD = 'GLOVE'
+PHOBERT_METHOD = 'PHOBERT'

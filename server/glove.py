@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from appService import getRatingFromModel
+from constants import *
 
 glove = Blueprint('glove', __name__, url_prefix="/api/v1/glove")
 
@@ -9,7 +10,7 @@ def using_cnn():
     title = req.get('title')
     content = req.get('content')
 
-    res = getRatingFromModel(title, content, 'CNN_MODEL.keras').tolist()
+    res = getRatingFromModel(title, content, CNN_MODEL, GLOVE_METHOD).tolist()
 
     return jsonify({'prediction': res})
 
@@ -19,9 +20,9 @@ def using_lstm():
     title = req.get('title')
     content = req.get('content')
 
-    res = getRatingFromModel(title, content, 'LSTM_MODEL.keras')
+    res = getRatingFromModel(title, content, LSTM_MODEL, GLOVE_METHOD).tolist()
 
-    return jsonify(res)
+    return jsonify({'prediction': res})
 
 @glove.post('/bilstm')
 def using_bilstm():
@@ -29,9 +30,9 @@ def using_bilstm():
     title = req.get('title')
     content = req.get('content')
 
-    res = getRatingFromModel(title, content, 'BILSTM_MODEL.keras')
+    res = getRatingFromModel(title, content, BILSTM_MODEL, GLOVE_METHOD).tolist()
 
-    return jsonify(res)
+    return jsonify({'prediction': res})
 
 @glove.post('/ensemble')
 def using_ensemble_cnn_bilstm():
@@ -39,9 +40,9 @@ def using_ensemble_cnn_bilstm():
     title = req.get('title')
     content = req.get('content')
 
-    res = getRatingFromModel(title, content, 'ENSEMBLE_CNN_BILSTM_MODEL.keras')
+    res = getRatingFromModel(title, content, ENSEMBLE_CNN_BILSTM, GLOVE_METHOD).tolist()
 
-    return jsonify(res)
+    return jsonify({'prediction': res})
 
 @glove.post('/fusion')
 def using_fusion_cnn_bilstm():
@@ -49,6 +50,6 @@ def using_fusion_cnn_bilstm():
     title = req.get('title')
     content = req.get('content')
 
-    res = getRatingFromModel(title, content, 'FUSION_CNN_BILSTM_MODEL.keras')
+    res = getRatingFromModel(title, content, FUSION_CNN_BILSTM, GLOVE_METHOD).tolist()
 
-    return jsonify(res)
+    return jsonify({'prediction': res})
