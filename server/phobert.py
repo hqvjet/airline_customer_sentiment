@@ -34,7 +34,7 @@ def using_bilstm():
 
     return jsonify({'prediction': res})
 
-@phobert.post('/ensemble')
+@phobert.post('/ensemble_cnn_bilstm')
 def using_ensemble_cnn_bilstm():
     req = request.get_json()
     title = req.get('title')

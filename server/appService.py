@@ -18,8 +18,8 @@ phobert_ensemble = getModel(PHOBERT_PATH + ENSEMBLE_CNN_BILSTM)
 print('LOADING PHOBERT MODEL DONE ................')
 
 def getRatingFromModel(title, content, model_name, emb_tech):
-    title_ids = getIDS(title)
-    text_ids = getIDS(content)
+    title_ids = getIDS(title, emb_tech)
+    text_ids = getIDS(content, emb_tech)
 
     if emb_tech == GLOVE_METHOD:
         if model_name == CNN_MODEL:

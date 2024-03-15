@@ -34,7 +34,7 @@ def using_bilstm():
 
     return jsonify({'prediction': res})
 
-@glove.post('/ensemble')
+@glove.post('/ensemble_cnn_bilstm')
 def using_ensemble_cnn_bilstm():
     req = request.get_json()
     title = req.get('title')
@@ -44,7 +44,7 @@ def using_ensemble_cnn_bilstm():
 
     return jsonify({'prediction': res})
 
-@glove.post('/fusion')
+@glove.post('/fusion_cnn_bilstm')
 def using_fusion_cnn_bilstm():
     req = request.get_json()
     title = req.get('title')
