@@ -105,7 +105,7 @@ def getDataset(file_name):
     label = pd.Series([status for status in file['Rating'].apply(int)])
     label = utils.to_categorical(label - 1, num_classes=3)
 
-    return title[:5], text[:5], label[:5]
+    return title, text, label
 
 def getFeature(ids):
 
