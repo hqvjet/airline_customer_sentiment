@@ -7,3 +7,4 @@ scikit-learn
 vncorenlp
 fairseq
 fastBPE
+matplotlib

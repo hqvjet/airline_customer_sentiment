@@ -17,7 +17,8 @@ import pandas as pd
 import torch
 from constants import *
 from Nomarlize import normalizeSentence, statusToNumber
-
+import numpy as np
+from transformers import AutoModel, TFAutoModel, AutoTokenizer
 # LOAD MODEL AND BPE
 parser = argparse.ArgumentParser()
 parser.add_argument('--bpe-codes', 
@@ -29,29 +30,47 @@ parser.add_argument('--bpe-codes',
 args, unknown = parser.parse_known_args()
 bpe = fastBPE(args)
 rdr = VnCoreNLP(PATH + "vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
-
 # Load the dictionary
 vocab = Dictionary()
 vocab.add_from_file(PATH + "PhoBERT_large_transformers/dict.txt")
+tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-large")
 
+def test():
+    phobert, tokenizer = loadPhobert()
+    data = ['Tôi là sinh viên trường đại học bách khoa hà nội', 'Nhiều khi anh mong được một lần nói ra hết tất cả thay vì']
+    print(torch.tensor([tokenizer.encode(data[0])]))
+
+    data = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence))) for sentence in data]
+    print(data)
+    print(bpe.encode(data[0]))
+    print(tokenizer.encode(data[0]))
+    print(vocab.encode_line(data[0], append_eos=True, add_if_not_exist=False).long().tolist())
+    
+
+def loadPhobert():
+    print('Loading PhoBERT model............')
+    phobert = TFAutoModel.from_pretrained("vinai/phobert-large")
+    tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-large")
+
+    return phobert, tokenizer
+    
 def getDataIDS(data):
     data_ids = []
     for sentence in data:
-        words = '<s>' + bpe.encode(sentence) + '</s>'
-        encoded_setence = vocab.encode_line(words, append_eos=True, add_if_not_exist=False).long().tolist()
+        encoded_setence = tokenizer.encode(sentence)
         data_ids.append(encoded_setence)
     # PAD TO MAXLEN
-    data_ids = pad_sequences(data_ids, maxlen=MAX_LEN, dtype='long', value=0, truncating='post', padding='post')
+    data_ids = pad_sequences(data_ids, maxlen=MAX_LEN, dtype='long', value=1, truncating='post', padding='post')
 
-    return torch.tensor(data_ids)
+    return data_ids
 
-def getMask(data_ids):
-    data_masks = []
-    for sentence in data_ids:
-        mask = [int(token_id > 0) for token_id in sentence]
-        data_masks.append(mask)
+def getAttentionMask(data_ids):
+    print('GETTING ATTENTION MASK..................................')
+    data_masks = np.where(data_ids == 1, 0, 1)
+    print(data_masks.shape)
+    print(data_masks[0])
 
-    return torch.tensor(data_masks)
+    return data_masks
 
 def prepareData(title, text):
     # TOKENIZE DATASET
@@ -74,7 +93,6 @@ def prepareData(title, text):
 
     return title_ids, text_ids
 
-
 def getDataset(file_name):
     # GET FROM CSV (ORIGINAL TEXT)
     print('READING DATASET FROM FILE................................')
@@ -87,24 +105,46 @@ def getDataset(file_name):
     label = pd.Series([status for status in file['Rating'].apply(int)])
     label = utils.to_categorical(label - 1, num_classes=3)
 
-    return train_test_split(title, text, label, test_size=0.1)
+    return title[:5], text[:5], label[:5]
+
+def getFeature(ids):
+
+    print('LOADING PHOBERT MODEL......................')
+    phobert = TFAutoModel.from_pretrained("vinai/phobert-large")
+    # phobert2 = AutoModel.from_pretrained("vinai/phobert-large")
+    print('EXTRACTING FEATURES........................')
+    output = phobert(input_ids=ids, attention_mask=getAttentionMask(ids))
+    # with torch.no_grad():
+        # last_hidden_states = phobert2(input_ids=torch.tensor(ids), attention_mask=torch.tensor(getAttentionMask(ids)))
+
+    features = output.last_hidden_state.numpy()
+    # features = last_hidden_states[0][:, 0, :].numpy()
+    print(features.shape)
+
+    return features
 
 def usingPhoBERT():
+    title, text, labels = getDataset('data.csv')
+
+    # IDS input
+    title_ids, text_ids = prepareData(title, text)
+
+    # GET features
+    title_features = getFeature(title_ids)
+    text_features = getFeature(text_ids)
     
-    title_train, title_test, text_train, text_test, train_labels, test_labels = getDataset('data.csv')
+    print(title_features)
+    print(type(title_features))
+    # SPLIT DATASET
+    title_train, title_test, text_train, text_test, train_labels, test_labels = train_test_split(title_features, text_features, labels, test_size=0.1, random_state=0)
+    title_train, title_val, text_train, text_val, train_labels, val_labels = train_test_split(title_train, text_train, train_labels, test_size=0.1, random_state=0)
 
-    title_train, title_val, text_train, text_val, train_labels, val_labels = train_test_split(title_train, text_train, train_labels, test_size=0.1)
-
-    title_train_ids, text_train_ids = prepareData(title_train, text_train)
-    title_val_ids, text_val_ids = prepareData(title_val, text_val)
-    title_test_ids, text_test_ids = prepareData(title_test, text_test)
-
-    return title_train_ids, text_train_ids, train_labels, title_val_ids, text_val_ids, val_labels, title_test_ids, text_test_ids, test_labels, len(vocab)
+    return title_train, text_train, train_labels, title_val, text_val, val_labels, title_test, text_test, test_labels, len(vocab)
 
 def getIDS(sentence):
     sentence = normalizeSentence(sentence)
     sentence = rdr.tokenize(sentence)
-    sentence = sentence[0]
+    sentence = sentence[0]  
     print(sentence)
     sentence = [' '.join(sentence)]
     sentence_ids = getDataIDS(sentence)

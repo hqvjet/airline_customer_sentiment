@@ -19,6 +19,7 @@ class CNN:
             val_text,
             val_rating,
             vocab_size,
+            features,
     ):
         self.title_input = None
         self.text_input = None
@@ -29,6 +30,7 @@ class CNN:
         self.val_text = val_text
         self.val_rating = val_rating
         self.vocab_size = vocab_size
+        self.features = features
         self.output = self.getOutput() 
         self.model = self.buildModel()
 
@@ -37,14 +39,15 @@ class CNN:
         num_filters = 256
         filter_sizes = [2, 3, 4, 5]
         DROP = 0.5
+        features_dim = self.features.shape[-1]
         
-        self.title_input = Input(shape=(self.train_title.shape[1],))
-        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
-        reshape_title = Reshape((self.train_title.shape[1], EMBEDDING_DIM, 1))(title_embedding)
+        self.title_input = Input(shape=(self.train_title.shape[1], features_dim))
+        # title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
+        # reshape_title = Reshape((self.train_title.shape[1], EMBEDDING_DIM, 1))(self.title_input)
         
         title_conv_blocks = []
         for filter_size in filter_sizes:
-            title_conv = Conv2D(num_filters, kernel_size=(filter_size, EMBEDDING_DIM), padding='valid', kernel_initializer='normal', activation='relu')(reshape_title)
+            title_conv = Conv2D(num_filters, kernel_size=(filter_size, features_dim), padding='valid', kernel_initializer='normal', activation='relu')(self.title_input)
             title_pool = MaxPool2D(pool_size=(self.train_title.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(title_conv)
             title_conv_blocks.append(title_pool)
         title_concat = Concatenate(axis=1)(title_conv_blocks)
@@ -52,12 +55,12 @@ class CNN:
         title_drop = Dropout(DROP)(title_flat)
 
         # Input for text
-        self.text_input = Input(shape=(self.train_text.shape[1],))
-        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=TRAINABLE)(self.text_input)
-        reshape_text = Reshape((self.train_text.shape[1], EMBEDDING_DIM, 1))(text_embedding)
+        self.text_input = Input(shape=(self.train_text.shape[1], features_dim))
+        # text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=TRAINABLE)(self.text_input)
+        # reshape_text = Reshape((self.train_text.shape[1], EMBEDDING_DIM, 1))(self.text_input)
         text_conv_blocks = []
         for filter_size in filter_sizes:
-            text_conv = Conv2D(num_filters, kernel_size=(filter_size, EMBEDDING_DIM), padding='valid', kernel_initializer='normal', activation='relu')(reshape_text)
+            text_conv = Conv2D(num_filters, kernel_size=(filter_size, features_dim), padding='valid', kernel_initializer='normal', activation='relu')(self.text_input)
             text_pool = MaxPool2D(pool_size=(self.train_text.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(text_conv)
             text_conv_blocks.append(text_pool)
         text_concat = Concatenate(axis=1)(text_conv_blocks)

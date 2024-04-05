@@ -1,4 +1,4 @@
-from keras.layers import Input, Bidirectional, LSTM, Dense, SpatialDropout1D, Dropout
+from keras.layers import Input, Bidirectional, LSTM, Dense, SpatialDropout1D, Dropout, GlobalAveragePooling1D
 from keras.models import Model, load_model
 from tensorflow.keras.layers import Embedding, Average, Concatenate
 from keras.layers import concatenate
@@ -39,16 +39,16 @@ class BiLSTM:
         hidden_size = 256
         DROP = 0.2
         # Define input layers for the title and text inputs
-        self.title_input = Input(shape=(self.train_title.shape[1],))
-        self.text_input = Input(shape=(self.train_text.shape[1],))
+        self.title_input = Input(shape=(self.train_title.shape[1], self.train_title.shape[2]))
+        self.text_input = Input(shape=(self.train_text.shape[1], self.train_text.shape[2]))
 
         # Embedding layer for title
-        title_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, trainable=TRAINABLE)(self.title_input)
+        # title_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, trainable=TRAINABLE)(self.title_input)
         # Embedding layer for text
-        text_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, trainable=TRAINABLE)(self.text_input)
+        # text_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, trainable=TRAINABLE)(self.text_input)
 
-        title_avg = SpatialDropout1D(DROP)(title_embedding)
-        text_avg = SpatialDropout1D(DROP)(text_embedding)
+        title_avg = SpatialDropout1D(DROP)(self.title_input)
+        text_avg = SpatialDropout1D(DROP)(self.text_input)
 
         # Bidirectional LSTM layer for title
         title_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(title_avg)
@@ -58,9 +58,14 @@ class BiLSTM:
         title_bilstm = Dropout(DROP)(title_bilstm)
         text_bilstm = Dropout(DROP)(text_bilstm)
 
+        title_avg = GlobalAveragePooling1D()(title_bilstm)
+        text_avg = GlobalAveragePooling1D()(text_bilstm)
+
+        concatenated = concatenate([title_avg, text_avg])
+
         # Concatenate title and text pooling layers
-        average_pooling = Average()([title_bilstm, text_bilstm])
-        dense = Dense(128, activation='relu')(average_pooling)
+        # average_pooling = Average()([title_bilstm, text_bilstm])
+        dense = Dense(128, activation='relu')(concatenated)
         dense = Dense(64, activation='relu')(dense)
         dense = Dense(32, activation='relu')(dense)
 
