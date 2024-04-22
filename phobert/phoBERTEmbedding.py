@@ -19,21 +19,22 @@ from constants import *
 from Nomarlize import normalizeSentence, statusToNumber
 import numpy as np
 from transformers import AutoModel, TFAutoModel, AutoTokenizer
+import tensorflow as tf
 # LOAD MODEL AND BPE
-parser = argparse.ArgumentParser()
-parser.add_argument('--bpe-codes', 
-    default=PATH + "PhoBERT_large_transformers/bpe.codes",
-    required=False,
-    type=str,
-    help='path to fastBPE BPE'
-)
-args, unknown = parser.parse_known_args()
-bpe = fastBPE(args)
+# parser = argparse.ArgumentParser()
+# parser.add_argument('--bpe-codes', 
+#     default=PATH + "PhoBERT_large_transformers/bpe.codes",
+#     required=False,
+#     type=str,
+#     help='path to fastBPE BPE'
+# )
+# args, unknown = parser.parse_known_args()
+# bpe = fastBPE(args)
 rdr = VnCoreNLP(PATH + "vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
 # Load the dictionary
-vocab = Dictionary()
-vocab.add_from_file(PATH + "PhoBERT_large_transformers/dict.txt")
-tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-large")
+# vocab = Dictionary()
+# vocab.add_from_file(PATH + "PhoBERT_large_transformers/dict.txt")
+tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base-v2")
 
 def test():
     phobert, tokenizer = loadPhobert()
@@ -65,10 +66,7 @@ def getDataIDS(data):
     return data_ids
 
 def getAttentionMask(data_ids):
-    print('GETTING ATTENTION MASK..................................')
     data_masks = np.where(data_ids == 1, 0, 1)
-    print(data_masks.shape)
-    print(data_masks[0])
 
     return data_masks
 
@@ -101,30 +99,44 @@ def getDataset(file_name):
     title = file['Title'].apply(str)
     text = file['Content'].apply(str)
 
-    # GET LABELS
-    label = pd.Series([status for status in file['Rating'].apply(int)])
-    label = utils.to_categorical(label - 1, num_classes=3)
-
-    return title, text, label
+    threshold = (8000 // PHOBERT_BATCH_SIZE) * PHOBERT_BATCH_SIZE
+    return title[:threshold], text[:threshold]
 
 def getFeature(ids):
 
     print('LOADING PHOBERT MODEL......................')
-    phobert = TFAutoModel.from_pretrained("vinai/phobert-large")
-    # phobert2 = AutoModel.from_pretrained("vinai/phobert-large")
-    print('EXTRACTING FEATURES........................')
-    output = phobert(input_ids=ids, attention_mask=getAttentionMask(ids))
-    # with torch.no_grad():
-        # last_hidden_states = phobert2(input_ids=torch.tensor(ids), attention_mask=torch.tensor(getAttentionMask(ids)))
+    phobert = TFAutoModel.from_pretrained("vinai/phobert-base-v2", from_pt=True)
+    features = []
 
-    features = output.last_hidden_state.numpy()
-    # features = last_hidden_states[0][:, 0, :].numpy()
+    print('EXTRACTING FEATURES........................')
+
+    # dataset = tf.data.Dataset.from_tensor_slices(ids)
+    # dataset = dataset.batch(PHOBERT_BATCH_SIZE)
+
+    # for ids_element in dataset:
+    #     output = phobert(input_ids=ids_element.numpy())
+    #
+    #     features.append(output[0].numpy())
+        # print(features[-1].shape)
+
+    num_batches = ids.shape[0] // PHOBERT_BATCH_SIZE
+
+    for batch in range(num_batches):
+        batch_element = ids[batch * PHOBERT_BATCH_SIZE : (batch + 1) * PHOBERT_BATCH_SIZE]
+        output = phobert(input_ids=batch_element, attention_mask=getAttentionMask(batch_element))
+        features.append(output.last_hidden_state)
+    # output = phobert(input_ids=ids)
+    features = tf.concat(features, axis=0)
+    # features = features.reshape(len(ids), MAX_LEN, 768)
+
+    # output = phobert(input_ids=ids, attention_mask=getAttentionMask(ids))
+    # features = output.last_hidden_state.numpy()
     print(features.shape)
 
     return features
 
-def usingPhoBERT():
-    title, text, labels = getDataset('data.csv')
+def extractFeatures():
+    title, text = getDataset('data.csv')
 
     # IDS input
     title_ids, text_ids = prepareData(title, text)
@@ -132,14 +144,18 @@ def usingPhoBERT():
     # GET features
     title_features = getFeature(title_ids)
     text_features = getFeature(text_ids)
-    
-    print(title_features)
-    print(type(title_features))
-    # SPLIT DATASET
-    title_train, title_test, text_train, text_test, train_labels, test_labels = train_test_split(title_features, text_features, labels, test_size=0.1, random_state=0)
-    title_train, title_val, text_train, text_val, train_labels, val_labels = train_test_split(title_train, text_train, train_labels, test_size=0.1, random_state=0)
 
-    return title_train, text_train, train_labels, title_val, text_val, val_labels, title_test, text_test, test_labels, len(vocab)
+    np.save(PATH + MODEL + PHOBERT_FEATURES_TITLE, title_features)
+    np.save(PATH + MODEL + PHOBERT_FEATURES_TEXT, text_features)
+
+    print('SAVED.....................')
+
+    # SPLIT DATASET
+    # title_train, title_test, text_train, text_test, train_labels, test_labels = train_test_split(title_train, text_train, labels, test_size=0.1)
+    # title_train, title_val, text_train, text_val, train_labels, val_labels = train_test_split(title_train, text_train, train_labels, test_size=0.1)
+    # print('DATA SPLIT DONE.................')
+    #
+    # return title_train, text_train, train_labels, title_val, text_val, val_labels, title_test, text_test, test_labels
 
 def getIDS(sentence):
     sentence = normalizeSentence(sentence)

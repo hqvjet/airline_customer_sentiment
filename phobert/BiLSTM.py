@@ -9,6 +9,7 @@ import numpy as np
 from constants import *
 from keras.utils import plot_model
 import matplotlib.pyplot as plt
+from tensorflow.keras.optimizers import Adam
 
 
 class BiLSTM:
@@ -21,9 +22,7 @@ class BiLSTM:
         val_title,
         val_text,
         val_rating,
-        vocab_size
     ):
-        self.vocab_size = vocab_size
         self.title_input = None
         self.text_input = None
         self.train_title = train_title
@@ -61,7 +60,7 @@ class BiLSTM:
         title_avg = GlobalAveragePooling1D()(title_bilstm)
         text_avg = GlobalAveragePooling1D()(text_bilstm)
 
-        concatenated = concatenate([title_avg, text_avg])
+        concatenated = Concatenate(axis=-1)([title_avg, text_avg])
 
         # Concatenate title and text pooling layers
         # average_pooling = Average()([title_bilstm, text_bilstm])
@@ -78,7 +77,8 @@ class BiLSTM:
         # Build the model
         model_BiLSTM = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        model_BiLSTM.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        opt = Adam(learning_rate=0.0001)
+        model_BiLSTM.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         model_BiLSTM.summary()
 
         plot_model(model_BiLSTM, to_file=PATH + MODEL_IMAGE + BILSTM_IMAGE, show_shapes=True, show_layer_names=True)
@@ -86,9 +86,8 @@ class BiLSTM:
         return model_BiLSTM
 
     def trainModel(self):
-        early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min')
-        checkpoint = ModelCheckpoint(PATH + MODEL + BILSTM_MODEL, save_best_only=True, monitor='val_loss', mode='min')
-        reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=LR_PATIENCE, verbose=1, epsilon=1e-4, mode='min')
+        early_stopping = EarlyStopping(monitor='val_accuracy', patience=STOP_PATIENCE, verbose=1, mode='max')
+        checkpoint = ModelCheckpoint(PATH + MODEL + BILSTM_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
@@ -96,7 +95,7 @@ class BiLSTM:
             batch_size=BATCH_SIZE,
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
-            callbacks=[early_stopping, checkpoint, reduce_lr_loss]
+            callbacks=[early_stopping, checkpoint]
         )
 
         # self.model.save(PATH + BILSTM_MODEL)

@@ -2,11 +2,12 @@ from keras.layers import Input, Embedding, Conv2D, MaxPool2D, Flatten, Dense, Co
 from keras.models import Model, load_model
 import numpy as np
 from sklearn.metrics import classification_report, accuracy_score
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from constants import *
 from tensorflow.keras import utils
 from keras.utils import plot_model
 import matplotlib.pyplot as plt
+from tensorflow.keras.optimizers import Adam
 
 class CNN:
 
@@ -18,8 +19,6 @@ class CNN:
             val_title,
             val_text,
             val_rating,
-            vocab_size,
-            features,
     ):
         self.title_input = None
         self.text_input = None
@@ -29,8 +28,6 @@ class CNN:
         self.val_title = val_title
         self.val_text = val_text
         self.val_rating = val_rating
-        self.vocab_size = vocab_size
-        self.features = features
         self.output = self.getOutput() 
         self.model = self.buildModel()
 
@@ -39,15 +36,14 @@ class CNN:
         num_filters = 256
         filter_sizes = [2, 3, 4, 5]
         DROP = 0.5
-        features_dim = self.features.shape[-1]
         
-        self.title_input = Input(shape=(self.train_title.shape[1], features_dim))
+        self.title_input = Input(shape=(self.train_title.shape[1], self.train_title.shape[2]))
         # title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], trainable=TRAINABLE)(self.title_input)
-        # reshape_title = Reshape((self.train_title.shape[1], EMBEDDING_DIM, 1))(self.title_input)
+        reshape_title = Reshape((self.train_title.shape[1], self.train_title.shape[2], 1))(self.title_input)
         
         title_conv_blocks = []
         for filter_size in filter_sizes:
-            title_conv = Conv2D(num_filters, kernel_size=(filter_size, features_dim), padding='valid', kernel_initializer='normal', activation='relu')(self.title_input)
+            title_conv = Conv2D(num_filters, kernel_size=(filter_size, self.train_title.shape[2]), padding='valid', kernel_initializer='normal', activation='relu')(reshape_title)
             title_pool = MaxPool2D(pool_size=(self.train_title.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(title_conv)
             title_conv_blocks.append(title_pool)
         title_concat = Concatenate(axis=1)(title_conv_blocks)
@@ -55,12 +51,13 @@ class CNN:
         title_drop = Dropout(DROP)(title_flat)
 
         # Input for text
-        self.text_input = Input(shape=(self.train_text.shape[1], features_dim))
+        self.text_input = Input(shape=(self.train_text.shape[1], self.train_text.shape[2]))
         # text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], trainable=TRAINABLE)(self.text_input)
-        # reshape_text = Reshape((self.train_text.shape[1], EMBEDDING_DIM, 1))(self.text_input)
+        reshape_text = Reshape((self.train_text.shape[1], self.train_text.shape[2], 1))(self.text_input)
+
         text_conv_blocks = []
         for filter_size in filter_sizes:
-            text_conv = Conv2D(num_filters, kernel_size=(filter_size, features_dim), padding='valid', kernel_initializer='normal', activation='relu')(self.text_input)
+            text_conv = Conv2D(num_filters, kernel_size=(filter_size, self.train_text.shape[2]), padding='valid', kernel_initializer='normal', activation='relu')(reshape_text)
             text_pool = MaxPool2D(pool_size=(self.train_text.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(text_conv)
             text_conv_blocks.append(text_pool)
         text_concat = Concatenate(axis=1)(text_conv_blocks)
@@ -68,7 +65,7 @@ class CNN:
         text_drop = Dropout(DROP)(text_flat)
 
         # Average two inputs
-        average = Average()([title_drop, text_drop])
+        average = Concatenate(axis=-1)([title_drop, text_drop])
 
         # Additional layers of the model
         dense1 = Dense(128, activation='relu')(average)
@@ -79,8 +76,8 @@ class CNN:
     def buildModel(self):
         # Build the model
         model_CNN = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
-
-        model_CNN.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        opt = Adam(learning_rate=0.0001)
+        model_CNN.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         model_CNN.summary()
         
         plot_model(model_CNN, to_file=PATH + MODEL_IMAGE + CNN_IMAGE, show_shapes=True, show_layer_names=True)
@@ -88,9 +85,8 @@ class CNN:
         return model_CNN
 
     def trainModel(self):
-        early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min')
-        checkpoint = ModelCheckpoint(PATH + MODEL + CNN_MODEL, save_best_only=True, monitor='val_loss', mode='min')
-        reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=LR_PATIENCE, verbose=1, epsilon=1e-4, mode='min')
+        early_stopping = EarlyStopping(monitor='val_accuracy', patience=STOP_PATIENCE, verbose=0, mode='max')
+        checkpoint = ModelCheckpoint(PATH + MODEL + CNN_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
@@ -98,7 +94,7 @@ class CNN:
             batch_size=BATCH_SIZE,
             verbose=1,
             validation_data=([np.array(self.val_title), np.array(self.val_text)], self.val_rating),
-            callbacks=[early_stopping, checkpoint, reduce_lr_loss]
+            callbacks=[early_stopping, checkpoint]
         )
 
         # self.model.save(PATH + MODEL + CNN_MODEL)
