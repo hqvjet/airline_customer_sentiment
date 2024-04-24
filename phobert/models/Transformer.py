@@ -1,18 +1,28 @@
+# from tensorflow import ops
+from keras.layers import Input, GlobalAveragePooling1D, Dense, Dropout, LayerNormalization, MultiHeadAttention, Layer, Concatenate
+from keras.models import Model, load_model
 import keras
-from keras import ops
-from keras import layers
+from tensorflow.keras.optimizers import Adam
+from keras.callbacks import EarlyStopping, ModelCheckpoint
+import numpy as np
+from sklearn.metrics import classification_report, accuracy_score
+from constants import *
+from tensorflow.keras import utils
+from keras.utils import plot_model
+import matplotlib.pyplot as plt
 
-class TransformerBlock(layers.Layer):
+
+class TransformerBlock(Layer):
     def __init__(self, embed_dim, num_heads, ff_dim, rate=0.1):
         super(TransformerBlock, self).__init__()
-        self.att = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
+        self.att = MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
         self.ffn = keras.Sequential(
-            [layers.Dense(ff_dim, activation="relu"), layers.Dense(embed_dim),]
+            [Dense(ff_dim, activation="relu"), Dense(embed_dim),]
         )
-        self.layernorm1 = layers.LayerNormalization(epsilon=1e-6)
-        self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
-        self.dropout1 = layers.Dropout(rate)
-        self.dropout2 = layers.Dropout(rate)
+        self.layernorm1 = LayerNormalization(epsilon=1e-6)
+        self.layernorm2 = LayerNormalization(epsilon=1e-6)
+        self.dropout1 = Dropout(rate)
+        self.dropout2 = Dropout(rate)
 
     def call(self, inputs, training):
         attn_output = self.att(inputs, inputs)
@@ -58,35 +68,37 @@ class Transformer():
     def getOutput(self):
         DROP = 0.1
 
-        x_title = layers.Input(shape=(self.train_title.shape[1], self.train_title.shape[2]))
+        self.title_input = Input(shape=(self.train_title.shape[1], self.train_title.shape[2]))
         transformer_block_title = TransformerBlock(self.train_title.shape[2], 6, 4*self.train_title.shape[2])
-        x_title = transformer_block(x)
-        x_title = layers.GlobalAveragePooling1D()(x)
-        x_title = layers.Dropout(DROP)(x)
+        x_title = transformer_block_title(self.title_input)
+        x_title = GlobalAveragePooling1D()(x_title)
+        x_title = Dropout(DROP)(x_title)
 
-        x_text = layers.Input(shape=(self.train_text.shape[1], self.train_text.shape[2]))
+        self.text_input = Input(shape=(self.train_text.shape[1], self.train_text.shape[2]))
         transformer_block_text = TransformerBlock(self.train_text.shape[2], 6, 4*self.train_text.shape[2])
-        x_text = transformer_block(x)
-        x_text = layers.GlobalAveragePooling1D()(x)
-        x_text = layers.Dropout(DROP)(x)
+        x_text = transformer_block_text(self.text_input)
+        x_text = GlobalAveragePooling1D()(x_text)
+        x_text = Dropout(DROP)(x_text)
         
-        concat = Conactenate(axis=-1)([x_title, x_text])
+        concat = Concatenate(axis=-1)([x_title, x_text])
 
-        x = layers.Dense(128, activation="relu")(concat)
-        x = layers.Dense(32, activation="relu")(x)
+        x = Dense(768, activation='relu')(concat)
+        x = Dense(512, activation="relu")(x)
+        x = Dense(128, activation='relu')(x)
+        x = Dense(32, activation="relu")(x)
 
-        return layers.Dense(3, activation="softmax")(x)
+        return Dense(3, activation="softmax")(x)
 
     def buildModel(self):
         # Build the model
         model_transformer = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
-        opt = Adam(learning_rate=0.0001)
-        model_CNN.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
-        model_CNN.summary()
+        opt = Adam(learning_rate=0.000001)
+        model_transformer.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
+        model_transformer.summary()
         
-        plot_model(model_CNN, to_file=PATH + MODEL_IMAGE + TRANSFORMER_IMAGE, show_shapes=True, show_layer_names=True)
+        plot_model(model_transformer, to_file=PATH + MODEL_IMAGE + TRANSFORMER_IMAGE, show_shapes=True, show_layer_names=True)
 
-        return model_CNN
+        return model_transformer
 
     def trainModel(self):
         early_stopping = EarlyStopping(monitor='val_accuracy', patience=STOP_PATIENCE, verbose=0, mode='max')
@@ -116,7 +128,7 @@ class Transformer():
         return self.model
     
     def testModel(self, x_test, y_test):
-        self.model = load_model(PATH + MODEL + TRANSFORMER_MODEL)
+        self.model = load_model(PATH + MODEL + TRANSFORMER_MODEL, custom_objects={'TransformerBlock': TransformerBlock})
         y_pred = self.model.predict(x_test)
         pred = np.argmax(y_pred, axis=1)
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))

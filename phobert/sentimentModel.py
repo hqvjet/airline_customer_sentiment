@@ -109,7 +109,7 @@ def startLearning():
         val_labels,
     )
 
-    transformer_model.trainModel()
+    # transformer_model.trainModel()
     transformer_model.testModel(
         [np.array(title_test_ids), np.array(text_test_ids)], 
         np.array(test_labels)
