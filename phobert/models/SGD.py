@@ -62,7 +62,6 @@ class SGD():
 
         plt.figure()
         plt.plot(history['accuracy'], label='Valid Accuracy')
-        plt.plot(history['iteration'], label='Iteration')
         plt.title('SGD Model')
         plt.ylabel('Value')
         plt.xlabel('Iteration')
