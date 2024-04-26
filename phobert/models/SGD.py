@@ -41,7 +41,7 @@ class SGD():
             'iteration': []
         }
         
-        iterations = 100
+        iterations = 200
         max_acc = 0
         model = SGDClassifier(loss='hinge')
         labels = np.unique(self.train_rating)

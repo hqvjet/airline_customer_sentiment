@@ -125,7 +125,7 @@ def startLearning():
         val_labels,
     )
 
-    # sgd_model.trainModel()
+    sgd_model.trainModel()
     sgd_model.testModel(
         [np.array(title_test_ids), np.array(text_test_ids)], 
         np.array(test_labels)
