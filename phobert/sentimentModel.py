@@ -10,6 +10,7 @@ from models.Ensemble_CNN_BILSTM import Ensemble_CNN_BILSTM
 from models.Fusion_CNN_BILSTM import Fusion_CNN_BILSTM
 from models.Transformer import Transformer
 from models.SGD import SGD
+from models.KNN import KNN
 
 
 # Dataset Prepare
@@ -115,8 +116,25 @@ def startLearning():
     #     [np.array(title_test_ids), np.array(text_test_ids)], 
     #     np.array(test_labels)
     # )
-    print('TRAINING USING SGD MODEL.................')
-    sgd_model = SGD(
+
+    # print('TRAINING USING SGD MODEL.................')
+    # sgd_model = SGD(
+    #     title_train_ids,
+    #     text_train_ids,
+    #     train_labels,
+    #     title_val_ids,
+    #     text_val_ids,
+    #     val_labels,
+    # )
+    #
+    # sgd_model.trainModel()
+    # sgd_model.testModel(
+    #     [np.array(title_test_ids), np.array(text_test_ids)], 
+    #     np.array(test_labels)
+    # )
+
+    print('TRAINING USING KNN MODEL.................')
+    knn_model = KNN(
         title_train_ids,
         text_train_ids,
         train_labels,
@@ -125,8 +143,8 @@ def startLearning():
         val_labels,
     )
 
-    sgd_model.trainModel()
-    sgd_model.testModel(
+    knn_model.trainModel()
+    knn_model.testModel(
         [np.array(title_test_ids), np.array(text_test_ids)], 
         np.array(test_labels)
     )
