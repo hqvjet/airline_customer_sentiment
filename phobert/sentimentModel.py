@@ -9,6 +9,7 @@ from usePhoBERT import usePhoBERT
 from models.Ensemble_CNN_BILSTM import Ensemble_CNN_BILSTM
 from models.Fusion_CNN_BILSTM import Fusion_CNN_BILSTM
 from models.Transformer import Transformer
+from models.SGD import SGD
 
 
 # Dataset Prepare
@@ -99,8 +100,23 @@ def startLearning():
   # )
   # print('TRAINING DONE.............................')
 
-    print('TRAINING USING TRANSFORMER MODEL.................')
-    transformer_model = Transformer(
+    # print('TRAINING USING TRANSFORMER MODEL.................')
+    # transformer_model = Transformer(
+    #     title_train_ids,
+    #     text_train_ids,
+    #     train_labels,
+    #     title_val_ids,
+    #     text_val_ids,
+    #     val_labels,
+    # )
+    #
+    # # transformer_model.trainModel()
+    # transformer_model.testModel(
+    #     [np.array(title_test_ids), np.array(text_test_ids)], 
+    #     np.array(test_labels)
+    # )
+    print('TRAINING USING SGD MODEL.................')
+    sgd_model = SGD(
         title_train_ids,
         text_train_ids,
         train_labels,
@@ -109,8 +125,8 @@ def startLearning():
         val_labels,
     )
 
-    # transformer_model.trainModel()
-    transformer_model.testModel(
+    # sgd_model.trainModel()
+    sgd_model.testModel(
         [np.array(title_test_ids), np.array(text_test_ids)], 
         np.array(test_labels)
     )
