@@ -11,6 +11,7 @@ from models.Fusion_CNN_BILSTM import Fusion_CNN_BILSTM
 from models.Transformer import Transformer
 from models.SGD import SGD
 from models.KNN import KNN
+from models.LOGISTIC_REGRESSION import LOGISTIC_REGRESSION
 
 
 # Dataset Prepare
@@ -133,8 +134,24 @@ def startLearning():
     #     np.array(test_labels)
     # )
 
-    print('TRAINING USING KNN MODEL.................')
-    knn_model = KNN(
+    # print('TRAINING USING KNN MODEL.................')
+    # knn_model = KNN(
+    #     title_train_ids,
+    #     text_train_ids,
+    #     train_labels,
+    #     title_val_ids,
+    #     text_val_ids,
+    #     val_labels,
+    # )
+    #
+    # knn_model.trainModel()
+    # knn_model.testModel(
+    #     [np.array(title_test_ids), np.array(text_test_ids)], 
+    #     np.array(test_labels)
+    # )
+
+    print('TRAINING USING LOGISTIC REGRESSION MODEL.................')
+    lg_model = LOGISTIC_REGRESSION(
         title_train_ids,
         text_train_ids,
         train_labels,
@@ -143,8 +160,8 @@ def startLearning():
         val_labels,
     )
 
-    knn_model.trainModel()
-    knn_model.testModel(
+    # lg_model.trainModel()
+    lg_model.testModel(
         [np.array(title_test_ids), np.array(text_test_ids)], 
         np.array(test_labels)
     )
