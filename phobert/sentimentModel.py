@@ -1,17 +1,19 @@
 import numpy as np
-
 from constants import *
+# from phoBERTEmbedding import extractFeatures
+from usePhoBERT import usePhoBERT
 from models.BILSTM import BiLSTM
 from models.LSTM import LSTM
 from models.CNN import CNN
-# from phoBERTEmbedding import extractFeatures
-from usePhoBERT import usePhoBERT
 from models.Ensemble_CNN_BILSTM import Ensemble_CNN_BILSTM
 from models.Fusion_CNN_BILSTM import Fusion_CNN_BILSTM
 from models.Transformer import Transformer
 from models.SGD import SGD
 from models.KNN import KNN
 from models.LOGISTIC_REGRESSION import LOGISTIC_REGRESSION
+from models.DECISION_FOREST import DECISION_FOREST
+from models.GRU import GRU
+from models.BIGRU import BIGRU
 
 
 # Dataset Prepare
@@ -150,8 +152,56 @@ def startLearning():
     #     np.array(test_labels)
     # )
 
-    print('TRAINING USING LOGISTIC REGRESSION MODEL.................')
-    lg_model = LOGISTIC_REGRESSION(
+    # print('TRAINING USING LOGISTIC REGRESSION MODEL.................')
+    # lg_model = LOGISTIC_REGRESSION(
+    #     title_train_ids,
+    #     text_train_ids,
+    #     train_labels,
+    #     title_val_ids,
+    #     text_val_ids,
+    #     val_labels,
+    # )
+    #
+    # # lg_model.trainModel()
+    # lg_model.testModel(
+    #     [np.array(title_test_ids), np.array(text_test_ids)], 
+    #     np.array(test_labels)
+    # )
+
+    # print('TRAINING USING DECISION FOREST MODEL.................')
+    # df_model = DECISION_FOREST(
+    #     title_train_ids,
+    #     text_train_ids,
+    #     train_labels,
+    #     title_val_ids,
+    #     text_val_ids,
+    #     val_labels,
+    # )
+    #
+    # df_model.trainModel()
+    # df_model.testModel(
+    #     [np.array(title_test_ids), np.array(text_test_ids)], 
+    #     np.array(test_labels)
+    # )
+
+    # print('TRAINING USING GRU MODEL.................')
+    # gru_model = GRU(
+    #     title_train_ids,
+    #     text_train_ids,
+    #     train_labels,
+    #     title_val_ids,
+    #     text_val_ids,
+    #     val_labels,
+    # )
+    #
+    # gru_model.trainModel()
+    # gru_model.testModel(
+    #     [np.array(title_test_ids), np.array(text_test_ids)], 
+    #     np.array(test_labels)
+    # )
+
+    print('TRAINING USING BIGRU MODEL.................')
+    bigru_model = BIGRU(
         title_train_ids,
         text_train_ids,
         train_labels,
@@ -160,8 +210,8 @@ def startLearning():
         val_labels,
     )
 
-    # lg_model.trainModel()
-    lg_model.testModel(
+    bigru_model.trainModel()
+    bigru_model.testModel(
         [np.array(title_test_ids), np.array(text_test_ids)], 
         np.array(test_labels)
     )
