@@ -14,6 +14,8 @@ from models.LOGISTIC_REGRESSION import LOGISTIC_REGRESSION
 from models.DECISION_FOREST import DECISION_FOREST
 from models.GRU import GRU
 from models.BIGRU import BIGRU
+from models.Ensemble_BIGRU_CNN import Ensemble_CNN_BIGRU
+from models.Fusion_BIGRU_CNN import Fusion_CNN_BIGRU
 
 
 # Dataset Prepare
@@ -200,8 +202,40 @@ def startLearning():
     #     np.array(test_labels)
     # )
 
-    print('TRAINING USING BIGRU MODEL.................')
-    bigru_model = BIGRU(
+    # print('TRAINING USING BIGRU MODEL.................')
+    # bigru_model = BIGRU(
+    #     title_train_ids,
+    #     text_train_ids,
+    #     train_labels,
+    #     title_val_ids,
+    #     text_val_ids,
+    #     val_labels,
+    # )
+    #
+    # bigru_model.trainModel()
+    # bigru_model.testModel(
+    #     [np.array(title_test_ids), np.array(text_test_ids)], 
+    #     np.array(test_labels)
+    # )
+
+    # print('TRAINING USING ENSEMBLE CNN + BIGRU MODEL.................')
+    # ensemble_cnn_bigru_model = Ensemble_CNN_BIGRU(
+    #     title_train_ids,
+    #     text_train_ids,
+    #     train_labels,
+    #     title_val_ids,
+    #     text_val_ids,
+    #     val_labels,
+    # )
+    #
+    # ensemble_cnn_bigru_model.trainModel()
+    # ensemble_cnn_bigru_model.testModel(
+    #     [np.array(title_test_ids), np.array(text_test_ids)], 
+    #     np.array(test_labels)
+    # )
+
+    print('TRAINING USING FUSION CNN + BIGRU MODEL.................')
+    fusion_cnn_bigru_model = Fusion_CNN_BIGRU(
         title_train_ids,
         text_train_ids,
         train_labels,
@@ -210,8 +244,8 @@ def startLearning():
         val_labels,
     )
 
-    bigru_model.trainModel()
-    bigru_model.testModel(
+    fusion_cnn_bigru_model.trainModel()
+    fusion_cnn_bigru_model.testModel(
         [np.array(title_test_ids), np.array(text_test_ids)], 
         np.array(test_labels)
     )
