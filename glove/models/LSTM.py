@@ -1,6 +1,6 @@
 from keras.models import Model, load_model
 from tensorflow.keras.layers import Embedding
-from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, Average
+from keras.layers import Input, Embedding, LSTM as LSTM_model, Dropout, Dense, Average, Concatenate
 from tensorflow.keras import utils
 from sklearn.metrics import classification_report, accuracy_score
 from keras.callbacks import EarlyStopping, ModelCheckpoint
@@ -40,7 +40,7 @@ class LSTM:
 
     def getOutput(self):
         hidden_size = 256
-        DROP = 0.3
+        DROP = 0.2
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], weights=[self.embedding_matrix], trainable=TRAINABLE)(self.title_input)
@@ -52,9 +52,9 @@ class LSTM:
         text_lstm = LSTM_model(hidden_size)(text_embedding)
         text_lstm = Dropout(DROP)(text_lstm)
 
-        average = Average()([title_lstm, text_lstm])
+        concat = Concatenate(axis=-1)([title_lstm, text_lstm])
 
-        final = Dense(128, activation='relu')(average)
+        final = Dense(128, activation='relu')(concat)
         final = Dense(64, activation='relu')(final)
 
         return Dense(3, activation='softmax')(final)

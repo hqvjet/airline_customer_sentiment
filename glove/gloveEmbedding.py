@@ -63,6 +63,20 @@ def getDataset(file_name):
 
   return train_test_split(title, text, label, test_size=0.1)
 
+def getDataset2(file_name):
+  # GET FROM CSV (ORIGINAL TEXT)
+  print('READING DATASET FROM FILE................................')
+  file = pd.read_csv(PATH + file_name)
+
+  title = file['Title'].apply(str)[:8000]
+  text = file['Content'].apply(str)[:8000]
+
+  # GET LABELS
+  label = pd.Series([status for status in file['Rating'].apply(int)[:8000]])
+  label = utils.to_categorical(label - 1, num_classes=3)
+
+  return train_test_split(title, text, label, test_size=0.1)
+
 def usingGlove():
   title_train, title_test, text_train, text_test, train_labels, test_labels = getDataset('data.csv')
 
@@ -82,6 +96,24 @@ def usingGlove():
 
   with open(PATH + MODEL + TOKENIZER_MODEL, 'wb') as pkl_file:
     pkl.dump(tokenizer, pkl_file)
+
+  title_train_ids, text_train_ids = prepareData(title_train, text_train, tokenizer)
+  title_val_ids, text_val_ids = prepareData(title_val, text_val, tokenizer)
+  title_test_ids, text_test_ids = prepareData(title_test, text_test, tokenizer)
+
+  return title_train_ids, text_train_ids, train_labels, title_val_ids, text_val_ids, val_labels, title_test_ids, text_test_ids, test_labels, tokenizer
+
+def usingGlove2():
+  title_train, title_test, text_train, text_test, train_labels, test_labels = getDataset2('data.csv')
+
+  title_train, title_val, text_train, text_val, train_labels, val_labels = train_test_split(title_train, text_train, train_labels, test_size=0.1)
+
+  title_train, text_train = tokenizeData(title_train, text_train)
+  title_test, text_test = tokenizeData(title_test, text_test)
+  title_val, text_val = tokenizeData(title_val, text_val)
+
+  with open(PATH + MODEL + TOKENIZER_MODEL, 'rb') as pkl_file:
+    tokenizer = pkl.load(pkl_file)
 
   title_train_ids, text_train_ids = prepareData(title_train, text_train, tokenizer)
   title_val_ids, text_val_ids = prepareData(title_val, text_val, tokenizer)

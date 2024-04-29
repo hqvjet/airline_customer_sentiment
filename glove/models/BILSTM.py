@@ -1,4 +1,4 @@
-from keras.layers import Input, Bidirectional, LSTM, Dense, Dropout, GlobalMaxPooling1D
+from keras.layers import Input, Bidirectional, LSTM, Dense, Dropout, GlobalMaxPooling1D, Concatenate
 from keras.models import Model, load_model
 from tensorflow.keras.layers import Embedding, Average
 from tensorflow.keras.optimizers import Adam
@@ -40,7 +40,7 @@ class BiLSTM:
 
     def getOutput(self):
         hidden_size = 256
-        DROP = 0.3
+        DROP = 0.2
 
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], weights=[self.embedding_matrix], trainable=TRAINABLE)(self.title_input)
@@ -56,10 +56,10 @@ class BiLSTM:
 
         # Global Max Pooling layer for text
 
-        average = Average()([title_lstm, text_lstm])
+        concat = Concatenate(axis=-1)([title_lstm, text_lstm])
 
         # final = Dense(256, activation='relu')(average)
-        final = Dense(128, activation='relu')(average)
+        final = Dense(128, activation='relu')(concat)
         final = Dense(64, activation='relu')(final)
 
         return Dense(3, activation='softmax')(final)
@@ -68,7 +68,7 @@ class BiLSTM:
         # Build the model
         model_BiLSTM = Model(inputs=[self.title_input, self.text_input], outputs=self.output)
 
-        opt = Adam(learning_rate=0.00001)
+        opt = Adam(learning_rate=0.00001) 
         model_BiLSTM.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         model_BiLSTM.summary()
 

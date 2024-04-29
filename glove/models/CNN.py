@@ -39,7 +39,7 @@ class CNN:
         # Input for title
         num_filters = 256
         filter_sizes = [3, 4, 5, 6]
-        DROP = 0.3
+        DROP = 0.2
         
         self.title_input = Input(shape=(self.train_title.shape[1],))
         title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], weights=[self.embedding_matrix], trainable=TRAINABLE)(self.title_input)
@@ -70,7 +70,7 @@ class CNN:
         text_drop = Dropout(DROP)(text_flat)
 
         # Average two inputs
-        average = Average()([title_drop, text_drop])
+        average = Concatenate(axis=-1)([title_drop, text_drop])
 
         # Additional layers of the model
         # dense = Dense(256, activation='relu')(average)

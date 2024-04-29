@@ -43,19 +43,33 @@ class CNN_BILSTM:
         self.title_input = Input(shape=(self.train_title.shape[1],))
         self.text_input = Input(shape=(self.train_text.shape[1],))
 
+        cnn = load_model(PATH + MODEL + CNN_MODEL)
+        # Rename the first model
+        cnn_renamed = Model(inputs=cnn.inputs, outputs=cnn.outputs, name='cnn_model')
+        cnn_renamed.set_weights(cnn.get_weights())
+        cnn_renamed.compile(optimizer=cnn.optimizer, loss=cnn.loss, metrics=cnn.metrics)
+
+        # Load the second model
+        bilstm = load_model(PATH + MODEL + BILSTM_MODEL)
+
+        # Rename the second model
+        bilstm_renamed = Model(inputs=bilstm.inputs, outputs=bilstm.outputs, name='bilstm_model')
+        bilstm_renamed.set_weights(bilstm.get_weights())
+        bilstm_renamed.compile(optimizer=bilstm.optimizer, loss=bilstm.loss, metrics=bilstm.metrics)
+
         # Get the predictions from the BiLSTM model
-        lstm_predictions = self.bilstm([self.title_input, self.text_input])
+        lstm_predictions = bilstm_renamed([self.title_input, self.text_input])
 
         # Get the predictions from the CNN model
-        cnn_predictions = self.cnn([self.title_input, self.text_input])
+        cnn_predictions = cnn_renamed([self.title_input, self.text_input])
 
         # Average predictions
         average_predictions = Average()([lstm_predictions, cnn_predictions])
 
         # Add a dense layer
-        # dense_layer = Dense(256, activation='relu')(average_predictions)
         dense_layer = Dense(128, activation='relu')(average_predictions)
-        dense_layer = Dense(64, activation='relu')(dense_layer)
+        # dense_layer = Dense(32, activation='relu')(lstm_predictions)
+        dense_layer = Dense(32, activation='relu')(dense_layer)
 
         # Add another dense layer for the final output
         return Dense(3, activation='softmax')(dense_layer)
