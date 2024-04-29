@@ -21,8 +21,6 @@ class CNN_BILSTM:
             val_text,
             val_rating,
             vocab_size,
-            bilstm,
-            cnn
     ):
         self.title_input = None
         self.text_input = None
@@ -33,8 +31,6 @@ class CNN_BILSTM:
         self.val_text = val_text
         self.val_rating = val_rating
         self.vocab_size = vocab_size
-        self.bilstm = bilstm
-        self.cnn = cnn
         self.output = self.getOutput()
         self.model = self.buildModel()
 
