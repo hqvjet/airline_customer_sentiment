@@ -73,21 +73,21 @@ def startLearning():
     #     np.array(test_labels)
     # )
 
-    # print('TRAINING USING ENSEMBLE CNN + BiLSTM MODEL.................')
-    # fusion_cnn_bilstm = Fusion_CNN_BILSTM(
-    #     title_train_ids,
-    #     text_train_ids,
-    #     train_labels,
-    #     title_val_ids,
-    #     text_val_ids,
-    #     val_labels,
-    # )
-    #
-    # fusion_cnn_bilstm.trainModel()
-    # fusion_cnn_bilstm.testModel(
-    #     [np.array(title_test_ids), np.array(text_test_ids)], 
-    #     np.array(test_labels)
-    # )
+    print('TRAINING USING FUSION CNN + BiLSTM MODEL.................')
+    fusion_cnn_bilstm = Fusion_CNN_BILSTM(
+        title_train_ids,
+        text_train_ids,
+        train_labels,
+        title_val_ids,
+        text_val_ids,
+        val_labels,
+    )
+
+    fusion_cnn_bilstm.trainModel()
+    fusion_cnn_bilstm.testModel(
+        [np.array(title_test_ids), np.array(text_test_ids)], 
+        np.array(test_labels)
+    )
 
   # print('TRAINING USING LSTM MODEL.........................')
   # lstm = LSTM(
@@ -104,7 +104,6 @@ def startLearning():
   #   [np.array(title_test_ids), np.array(text_test_ids)], 
   #   np.array(test_labels)
   # )
-  # print('TRAINING DONE.............................')
 
     # print('TRAINING USING TRANSFORMER MODEL.................')
     # transformer_model = Transformer(
@@ -234,18 +233,18 @@ def startLearning():
     #     np.array(test_labels)
     # )
 
-    print('TRAINING USING FUSION CNN + BIGRU MODEL.................')
-    fusion_cnn_bigru_model = Fusion_CNN_BIGRU(
-        title_train_ids,
-        text_train_ids,
-        train_labels,
-        title_val_ids,
-        text_val_ids,
-        val_labels,
-    )
-
-    fusion_cnn_bigru_model.trainModel()
-    fusion_cnn_bigru_model.testModel(
-        [np.array(title_test_ids), np.array(text_test_ids)], 
-        np.array(test_labels)
-    )
+    # print('TRAINING USING FUSION CNN + BIGRU MODEL.................')
+    # fusion_cnn_bigru_model = Fusion_CNN_BIGRU(
+    #     title_train_ids,
+    #     text_train_ids,
+    #     train_labels,
+    #     title_val_ids,
+    #     text_val_ids,
+    #     val_labels,
+    # )
+    #
+    # fusion_cnn_bigru_model.trainModel()
+    # fusion_cnn_bigru_model.testModel(
+    #     [np.array(title_test_ids), np.array(text_test_ids)], 
+    #     np.array(test_labels)
+    # )

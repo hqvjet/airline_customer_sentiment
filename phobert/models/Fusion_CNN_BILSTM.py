@@ -70,7 +70,7 @@ class Fusion_CNN_BILSTM:
         text_flat = Flatten()(text_concat)
         text_drop = Dropout(DROP)(text_flat)
 
-        average = Concatenate(axis=-1)([title_drop, text_drop])
+        average = Average()([title_drop, text_drop])
 
         dense1 = Dense(128, activation='relu')(average)
         dense1 = Dense(64, activation='relu')(dense1)
