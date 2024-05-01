@@ -29,6 +29,14 @@ def getEmbeddingMatrix(tokenizer, vocab_size):
 
   return emb_matrix
 
+def attachEmbeddingToIds(tokenizer, ids, emb_mat):
+    embedded_ids = np.zeros((ids.shape[0], ids.shape[1], EMBEDDING_DIM))
+    for i in range(ids.shape[0]):
+        for j in range(ids.shape[1]):
+            embedded_ids[i][j] = emb_mat[ids[i][j]]
+    
+    return embedded_ids
+
 def getDataIDS(sentences, tokenizer):
   ids = tokenizer.texts_to_sequences(sentences)
   return pad_sequences(ids, padding='post', maxlen=MAX_LEN)

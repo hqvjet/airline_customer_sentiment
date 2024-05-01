@@ -1,4 +1,4 @@
-from keras.layers import Input, Embedding, Conv2D, MaxPool2D, Flatten, Dense, Concatenate, Average, Bidirectional, LSTM, Reshape, Dropout
+from keras.layers import Input, Embedding, Conv2D, MaxPool2D, Flatten, Dense, Concatenate, Average, Bidirectional, GRU, Reshape, Dropout, SpatialDropout1D
 from keras.models import Model, load_model
 from tensorflow.keras.optimizers import Adam
 from keras.callbacks import EarlyStopping, ModelCheckpoint
@@ -10,7 +10,7 @@ from keras.utils import plot_model
 import matplotlib.pyplot as plt
 
 
-class CNN_BILSTM:
+class Fusion_CNN_BIGRU:
 
     def __init__(
             self,
@@ -21,7 +21,7 @@ class CNN_BILSTM:
             val_text,
             val_rating,
             vocab_size,
-            embedding_matrix
+            word_emb
     ):
         self.title_input = None
         self.text_input = None
@@ -32,7 +32,7 @@ class CNN_BILSTM:
         self.val_text = val_text
         self.val_rating = val_rating
         self.vocab_size = vocab_size
-        self.embedding_matrix = embedding_matrix
+        self.word_emb = word_emb
         self.output = self.getOutput() 
         self.model = self.buildModel()
 
@@ -43,18 +43,23 @@ class CNN_BILSTM:
         num_filters = 256
         filter_sizes = [3, 4, 5, 6]
 
-        self.title_input = Input(shape=(self.train_title.shape[1],))
-        self.text_input = Input(shape=(self.train_text.shape[1],))
-        title_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, weights=[self.embedding_matrix], trainable=TRAINABLE)(self.title_input)
-        text_embedding = Embedding(input_dim=self.vocab_size, output_dim=EMBEDDING_DIM, weights=[self.embedding_matrix], trainable=TRAINABLE)(self.text_input)
-        title_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(title_embedding)
-        text_bilstm = Bidirectional(LSTM(hidden_size, return_sequences=True))(text_embedding)
+        self.title_input = Input(shape=(self.train_title.shape[1], ))
+        self.text_input = Input(shape=(self.train_text.shape[1], ))
+
+        title_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_title.shape[1], weights=[self.word_emb], trainable=TRAINABLE)(self.title_input)
+        text_embedding = Embedding(self.vocab_size, EMBEDDING_DIM, input_length=self.train_text.shape[1], weights=[self.word_emb], trainable=TRAINABLE)(self.text_input)
+        
+        title_avg = SpatialDropout1D(DROP)(title_embedding)
+        text_avg = SpatialDropout1D(DROP)(text_embedding)
+
+        title_bilstm = Bidirectional(GRU(hidden_size, return_sequences=True))(title_avg)
+        text_bilstm = Bidirectional(GRU(hidden_size, return_sequences=True))(text_avg)
         title_reshape = Reshape((self.train_title.shape[1], hidden_size * 2, 1))(title_bilstm)
         text_reshape = Reshape((self.train_text.shape[1], hidden_size * 2, 1))(text_bilstm)
 
         title_conv_blocks = []
         for filter_size in filter_sizes:
-            title_conv = Conv2D(num_filters, kernel_size=(filter_size, EMBEDDING_DIM), padding='valid', kernel_initializer='normal', activation='relu')(title_reshape)
+            title_conv = Conv2D(num_filters, kernel_size=(filter_size, title_reshape.shape[2]), padding='valid', kernel_initializer='normal', activation='relu')(title_reshape)
             title_pool = MaxPool2D(pool_size=(self.train_title.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(title_conv)
             # title_pool = GlobalMaxPooling1D()(title_conv)
             title_conv_blocks.append(title_pool)
@@ -64,7 +69,7 @@ class CNN_BILSTM:
         
         text_conv_blocks = []
         for filter_size in filter_sizes:
-            text_conv = Conv2D(num_filters, kernel_size=(filter_size, EMBEDDING_DIM), padding='valid', kernel_initializer='normal', activation='relu')(text_reshape)
+            text_conv = Conv2D(num_filters, kernel_size=(filter_size, text_reshape.shape[2]), padding='valid', kernel_initializer='normal', activation='relu')(text_reshape)
             text_pool = MaxPool2D(pool_size=(self.train_text.shape[1] - filter_size + 1, 1), strides=(1,1), padding='valid')(text_conv)
             # text_pool = GlobalMaxPooling1D()(text_conv)
             text_conv_blocks.append(text_pool)
@@ -72,7 +77,7 @@ class CNN_BILSTM:
         text_flat = Flatten()(text_concat)
         text_drop = Dropout(DROP)(text_flat)
 
-        average = Average()([title_drop, text_drop])
+        average = Concatenate(axis=-1)([title_drop, text_drop])
 
         dense1 = Dense(128, activation='relu')(average)
         dense1 = Dense(64, activation='relu')(dense1)
@@ -87,13 +92,13 @@ class CNN_BILSTM:
         cnn_bilstm_model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         cnn_bilstm_model.summary()
 
-        plot_model(cnn_bilstm_model, to_file=PATH + MODEL_IMAGE + FUSION_CNN_BILSTM_IMAGE, show_shapes=True, show_layer_names=True)
+        plot_model(cnn_bilstm_model, to_file=PATH + MODEL_IMAGE + FUSION_CNN_BIGRU_IMAGE, show_shapes=True, show_layer_names=True)
 
         return cnn_bilstm_model
 
     def trainModel(self):
-        early_stopping = EarlyStopping(monitor='val_loss', patience=STOP_PATIENCE, verbose=0, mode='min')
-        checkpoint = ModelCheckpoint(PATH + MODEL + FUSION_CNN_BILSTM_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
+        early_stopping = EarlyStopping(monitor='val_accuracy', patience=STOP_PATIENCE, verbose=0, mode='max')
+        checkpoint = ModelCheckpoint(PATH + MODEL + FUSION_CNN_BIGRU_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
         history = self.model.fit(
             [np.array(self.train_title), np.array(self.train_text)],
             self.train_rating,
@@ -104,20 +109,20 @@ class CNN_BILSTM:
             callbacks=[early_stopping, checkpoint]
         )
 
-        # self.model.save(PATH + MODEL + FUSION_CNN_BILSTM_MODEL)
+        # self.model.save(PATH + MODEL + FUSION_CNN_BIGRU_MODEL)
 
         plt.figure()
         plt.plot(history.history['accuracy'], label='Train Accuracy')
         plt.plot(history.history['loss'], label='Train Loss')
-        plt.title('Fusion CNN + BiLSTM Model')
+        plt.title('Fusion CNN + BIGRU Model')
         plt.ylabel('Value')
         plt.xlabel('Epoch')
         plt.legend()
-        plt.savefig(PATH + CHART + FUSION_CNN_BILSTM_CHART)
+        plt.savefig(PATH + CHART + FUSION_CNN_BIGRU_CHART)
         plt.close()
     
     def testModel(self, x_test, y_test):
-        self.model = load_model(PATH + MODEL + FUSION_CNN_BILSTM_MODEL)
+        self.model = load_model(PATH + MODEL + FUSION_CNN_BIGRU_MODEL)
         y_pred = self.model.predict(x_test)
         pred = np.argmax(y_pred, axis=1)
         report = classification_report(y_test, utils.to_categorical(pred, num_classes=3))
@@ -126,7 +131,7 @@ class CNN_BILSTM:
         report += acc_line
         print(report)
 
-        with open(PATH + REPORT + FUSION_CNN_BILSTM_REPORT, 'w') as file:
+        with open(PATH + REPORT + FUSION_CNN_BIGRU_REPORT, 'w') as file:
             print(report, file=file)
 
-        print(f"Classification report saved to {PATH + REPORT + FUSION_CNN_BILSTM_REPORT}..................")
+        print(f"Classification report saved to {PATH + REPORT + FUSION_CNN_BIGRU_REPORT}..................")
