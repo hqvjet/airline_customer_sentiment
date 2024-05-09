@@ -3,4 +3,8 @@ flask
 httpx
 flask_cors
 tensorflow
-'flask[async]'
+flask[async]
+vncorenlp
+pandas
+numpy
+fairseq
