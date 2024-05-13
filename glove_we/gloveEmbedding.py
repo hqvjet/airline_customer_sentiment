@@ -1,3 +1,4 @@
+from glove_we import constants, Nomarlize
 from glove import Corpus, Glove
 import pandas as pd
 import numpy as np
@@ -152,3 +153,20 @@ def trainGlove():
   glove.add_dictionary(corpus.dictionary)
 
   glove.save(PATH + MODEL + GLOVE_MODEL)
+
+# Use for ML model
+def getFeatureWithEmbedded(sentence):
+    sentence = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence)))]
+    with open(PATH + MODEL + TOKENIZER_MODEL, 'rb') as pkl_file:
+        tokenizer = pkl.load(pkl_file)
+    ids = getDataIDS([sentence], tokenizer)
+    emb_matrix = getEmbeddingMatrix(ids)
+    return attachEmbeddingToIds(ids, emb_matrix)
+
+# Use for DL model
+def getFeature(sentence):
+    sentence = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence)))]
+    with open(PATH + MODEL + TOKENIZER_MODEL, 'rb') as pkl_file:
+        tokenizer = pkl.load(pkl_file)
+    ids = getDataIDS(sentence, tokenizer)
+    return ids

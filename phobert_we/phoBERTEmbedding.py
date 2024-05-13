@@ -157,12 +157,8 @@ def extractFeatures():
     #
     # return title_train, text_train, train_labels, title_val, text_val, val_labels, title_test, text_test, test_labels
 
-def getIDS(sentence):
-    sentence = normalizeSentence(sentence)
-    sentence = rdr.tokenize(sentence)
-    sentence = sentence[0]  
-    print(sentence)
-    sentence = [' '.join(sentence)]
-    sentence_ids = getDataIDS(sentence)
-
-    return sentence_ids
+def getFeaturePrediction(sentence):
+    sentence = normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence)))
+    ids = getDataIDS([sentence])
+    features = getFeature(ids)
+    return features

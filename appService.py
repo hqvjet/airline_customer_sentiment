@@ -2,6 +2,7 @@ from loadModel import getModel
 from encrypted import getIDS
 import numpy as np
 from constants import *
+from glove_we.gloveEmbedding import getFeature, getFeaturesWithEmbedded
 
 print('LOADING MODELS >>>>>>>>>>>>>>>')
 glove_cnn = getModel(GLOVE_PATH + CNN_MODEL)
@@ -35,6 +36,12 @@ phobert_log_reg = getModel(PHOBERT_PATH + LOGIS_REG_MODEL)
 print('LOADING PHOBERT MODEL DONE ................')
 
 def getRatingFromModel(title, content, model_name, emb_tech):
+    if model_name == KNN_MODEL or model_name == SGD_MODEL or model_name == DECISION_FOREST_MODEL or model_name == LOGIS_REG_MODEL:
+        title = getFeaturesWithEmbedded(title)
+        content = getFeaturesWithEmbedded(content)
+    else:
+        title = getFeature(title)
+        content = getFeature(content)
     title_ids = getIDS(title, emb_tech)
     text_ids = getIDS(content, emb_tech)
 
