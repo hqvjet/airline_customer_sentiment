@@ -63,15 +63,15 @@ export default function useAPI(path: string) {
         else if (model == 'fusion_cnn_bilstm')
             return usingPHOBERT.usingFUSION_CNN_BILSTM
         else if (model == 'fusion_cnn_bigru')
-            return usingGLOVE.usingFUSION_CNN_BIGRU
+            return usingPHOBERT.usingFUSION_CNN_BIGRU
         else if (model == 'transformer')
-            return usingGLOVE.usingTRANSFORMER
+            return usingPHOBERT.usingTRANSFORMER
         else if (model == 'logistic')
-            return usingGLOVE.usingLOGISTIC
+            return usingPHOBERT.usingLOGISTIC
         else if (model == 'sgd')
-            return usingGLOVE.usingSGD
+            return usingPHOBERT.usingSGD
         else if (model == 'random_forest')
-            return usingGLOVE.usingRANDOM_FOREST
+            return usingPHOBERT.usingRANDOM_FOREST
     }
 
     return null

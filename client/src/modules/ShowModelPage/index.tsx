@@ -25,13 +25,14 @@ export default function ShowModelPage() {
         if (apiFunction !== null) {
             apiFunction(values.title, values.content)
                 .then((response: any) => {
-                    const array = []
+                    let array = []
                     for (var i = 0; i < response.data.prediction[0].length; i += 1) {
                         array.push(response.data.prediction[0][i].toFixed(4))
                     }
-
+                    if (array.length == 0)
+                        array.push(response.data.prediction[0])
                     setPrediction(array)
-                    setSentiment(getSentiment(response.data.prediction[0]))
+                    setSentiment(getSentiment(array))
                     message.success('Post Successful!')
                 })
                 .catch((error: any) => {
@@ -93,13 +94,16 @@ export default function ShowModelPage() {
                     </Row>
                 </Col>
             </Card>
-            <Row justify={'center'} align={'middle'}>
+            {prediction.length > 1 ?
+            (<Row justify={'center'} align={'middle'}>
                 <Col className="w-2/3">
                     <Title level={3}><p className="text-white">Negative: {prediction[0]}</p></Title>
                     <Title level={3}><p className="text-white">Neutral: {prediction[1]}</p></Title>
                     <Title level={3}><p className="text-white">Positive: {prediction[2]}</p></Title>
                 </Col>
-            </Row>
+            </Row>) :
+            (<></>)
+            }
         </Space>
     )
 }
