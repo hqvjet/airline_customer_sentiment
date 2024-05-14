@@ -1,5 +1,5 @@
 import re
-from constants import PATH
+from phobert_we.constants import PATH
 import pandas as pd
 
 stopword = pd.read_csv(PATH + 'stopword.csv')

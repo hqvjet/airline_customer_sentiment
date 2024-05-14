@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-from glove import glove
-from phobert import phobert
+from glove_bp import glove
+from phobert_bp import phobert
 
 app = Flask(__name__)
 CORS(app)

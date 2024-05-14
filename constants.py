@@ -1,5 +1,5 @@
-GLOVE_PATH = '../glove/resources/glove/models/'
-PHOBERT_PATH = '../phobert/resources/phobert/models/'
+GLOVE_PATH = 'glove_we/resources/glove/models/'
+PHOBERT_PATH = 'phobert_we/resources/phobert/models/'
 
 CNN_MODEL = 'CNN_MODEL.keras'
 LSTM_MODEL = 'LSTM_MODEL.keras'

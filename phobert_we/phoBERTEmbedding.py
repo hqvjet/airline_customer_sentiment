@@ -15,8 +15,8 @@ from fairseq.data import Dictionary
 import argparse
 import pandas as pd
 import torch
-from constants import *
-from Nomarlize import normalizeSentence, statusToNumber
+from phobert_we.constants import *
+from phobert_we.Nomarlize import normalizeSentence, statusToNumber
 import numpy as np
 from transformers import AutoModel, TFAutoModel, AutoTokenizer
 import tensorflow as tf
@@ -30,7 +30,7 @@ import tensorflow as tf
 # )
 # args, unknown = parser.parse_known_args()
 # bpe = fastBPE(args)
-rdr = VnCoreNLP(PATH + "vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
+rdr = VnCoreNLP("tools/vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
 # Load the dictionary
 # vocab = Dictionary()
 # vocab.add_from_file(PATH + "PhoBERT_large_transformers/dict.txt")
@@ -157,8 +157,13 @@ def extractFeatures():
     #
     # return title_train, text_train, train_labels, title_val, text_val, val_labels, title_test, text_test, test_labels
 
+phobert = TFAutoModel.from_pretrained("vinai/phobert-base-v2", from_pt=True)
 def getFeaturePrediction(sentence):
     sentence = normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence)))
     ids = getDataIDS([sentence])
-    features = getFeature(ids)
+    features = []
+    output = phobert(input_ids=ids, attention_mask=getAttentionMask(ids))
+    features.append(output.last_hidden_state)
+    features = np.array(features)
+    print(features.shape)
     return features

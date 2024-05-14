@@ -1,4 +1,3 @@
-from glove_we import constants, Nomarlize
 from glove import Corpus, Glove
 import pandas as pd
 import numpy as np
@@ -9,13 +8,14 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from sklearn.model_selection import train_test_split
 import pickle as pkl
 
-from constants import *
-from Nomarlize import normalizeSentence
+from glove_we.constants import *
+from glove_we.Nomarlize import normalizeSentence
 
-rdr = VnCoreNLP(PATH + "vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
+rdr = VnCoreNLP("tools/vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
 
-def getEmbeddingMatrix(tokenizer, vocab_size):
+def getEmbeddingMatrix(tokenizer):
   print('LOADING GLOVE MODEL......................................')
+  vocab_size = len(tokenizer.word_index) + 1
   glove_model = Glove.load(PATH + MODEL + GLOVE_MODEL)
   emb_dict = dict()
 
@@ -154,19 +154,10 @@ def trainGlove():
 
   glove.save(PATH + MODEL + GLOVE_MODEL)
 
-# Use for ML model
-def getFeatureWithEmbedded(sentence):
-    sentence = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence)))]
-    with open(PATH + MODEL + TOKENIZER_MODEL, 'rb') as pkl_file:
-        tokenizer = pkl.load(pkl_file)
-    ids = getDataIDS([sentence], tokenizer)
-    emb_matrix = getEmbeddingMatrix(ids)
-    return attachEmbeddingToIds(ids, emb_matrix)
-
-# Use for DL model
 def getFeature(sentence):
     sentence = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence)))]
     with open(PATH + MODEL + TOKENIZER_MODEL, 'rb') as pkl_file:
         tokenizer = pkl.load(pkl_file)
     ids = getDataIDS(sentence, tokenizer)
-    return ids
+    emb_matrix = getEmbeddingMatrix(tokenizer)
+    return attachEmbeddingToIds(tokenizer, ids, emb_matrix)

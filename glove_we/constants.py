@@ -1,4 +1,4 @@
-PATH = 'resources/'
+PATH = 'glove_we/resources/'
 MAX_LEN = 256
 EPOCH = 1000
 BATCH_SIZE = 8

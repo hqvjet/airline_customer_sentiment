@@ -1,4 +1,4 @@
-PATH = 'resources/'
+PATH = 'phobert_we/resources/'
 MAX_LEN = 258
 EPOCH = 1000
 BATCH_SIZE = 8

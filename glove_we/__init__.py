@@ -1,5 +1,5 @@
 import tensorflow as tf
-from sentimentModel import startLearning
+# from sentimentModel import startLearning
 
 def checkForGPU():
     if tf.test.is_gpu_available():
@@ -9,4 +9,4 @@ def checkForGPU():
 
 if __name__ == '__main__':
     checkForGPU()
-    startLearning()
+    # startLearning()
