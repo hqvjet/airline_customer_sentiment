@@ -15,151 +15,61 @@ export default function ModelSelectPage() {
                     <Link href="/show-model/glove/cnn" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">CNN MODEL</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.CNN.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.CNN.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.CNN.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/glove/lstm" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">{GLOVE_INFO.LSTM.name}</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.LSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.LSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.LSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/glove/bilstm" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">BiLSTM MODEL</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/glove/gru" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">GRU</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/glove/bigru" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">BiGRU</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/glove/ensemble_cnn_bilstm" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">ENSEMBLE CNN + BILSTM</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.ENSEMBLE_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.ENSEMBLE_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.ENSEMBLE_CNN_BILSTM.neg}</p>
-                            </Col>
-                        </Button>
-                    </Link>
-                    <Link href="/show-model/glove/ensemble_cnn_bigru" className="w-1/6" passHref>
-                        <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
-                            <p className="text-white">ENSEMBLE CNN BIGRU</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/glove/fusion_cnn_bilstm" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">FUSION CNN + BILSTM</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/glove/fusion_cnn_bigru" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">FUSION CNN BiGRU</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/glove/transformer" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">TRANSFORMER</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
-                        </Button>
-                    </Link>
-                    <Link href="/show-model/glove/logistic" className="w-1/6" passHref>
-                        <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
-                            <p className="text-white">LOGISTIC REGRESSION</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/glove/random_forest" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">RANDOM FOREST</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/glove/sgd" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">SGD</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/glove/random_forest" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">KNN</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
-                        </Button>
-                    </Link>
-                    <Link href="/show-model/glove/random_forest" className="w-1/6" passHref>
-                        <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
-                            <p className="text-white">DECISION TREE</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                </Row >
@@ -170,151 +80,61 @@ export default function ModelSelectPage() {
                     <Link href="/show-model/phobert/cnn" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">CNN MODEL</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.CNN.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.CNN.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.CNN.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/phobert/lstm" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">LSTM MODEL</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.LSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.LSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.LSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/phobert/bilstm" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">BiLSTM MODEL</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/phobert/gru" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">GRU</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/phobert/bigru" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">BIGRU</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/phobert/ensemble_cnn_bilstm" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">ENSEMBLE CNN + BILSTM</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.ENSEMBLE_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.ENSEMBLE_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.ENSEMBLE_CNN_BILSTM.neg}</p>
-                            </Col>
-                        </Button>
-                    </Link>
-                    <Link href="/show-model/phobert/ensemble_cnn_bigru" className="w-1/6" passHref>
-                        <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
-                            <p className="text-white">ENSEMBLE CNN + BIGRU</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/phobert/fusion_cnn_bilstm" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">FUSION CNN + BILSTM</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/phobert/fusion_cnn_bigru" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">FUSION CNN + BIGRU</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/phobert/transformer" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">TRANSFORMER</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
-                        </Button>
-                    </Link>
-                    <Link href="/show-model/phobert/logistic" className="w-1/6" passHref>
-                        <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
-                            <p className="text-white">LOGISTIC REGRESSION</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/phobert/random_forest" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">RANDOM FOREST</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/phobert/sgd" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">SGD</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                     <Link href="/show-model/phobert/random_forest" className="w-1/6" passHref>
                         <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
                             <p className="text-white">KNN</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
-                        </Button>
-                    </Link>
-                    <Link href="/show-model/phobert/random_forest" className="w-1/6" passHref>
-                        <Button size='large' type='primary' className="w-full h-full shadow shadow-white" >
-                            <p className="text-white">DECISION TREE</p>
-                            <Col>
-                                <p className="text-green-500">Positive: {GLOVE_INFO.FUSION_CNN_BILSTM.pos}</p>
-                                <p className="text-yellow-500">Neutral: {GLOVE_INFO.FUSION_CNN_BILSTM.neu}</p>
-                                <p className="text-red-500">Negative: {GLOVE_INFO.FUSION_CNN_BILSTM.neg}</p>
-                            </Col>
                         </Button>
                     </Link>
                 </Row>

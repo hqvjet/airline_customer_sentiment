@@ -66,7 +66,7 @@ export default function ShowModelPage() {
                                 },
                             ]}
                         >
-                            <Input prefix={<MdOutlineTitle />} placeholder="Leave Title Here" />
+                            <Input prefix={<MdOutlineTitle />} placeholder="Leave Title Here" autoComplete="off" />
                         </Form.Item>
                         <Form.Item
                             name='content'
