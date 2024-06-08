@@ -58,7 +58,7 @@ def using_ensemble_cnn_bilstm():
     title = req.get('title')
     content = req.get('content')
 
-    res = getRatingFromModel(title, content, ENSEMBLE_CNN_BILSTM, PHOBERT_METHOD).tolist()
+    res = getRatingFromModel(title, content, ENSEMBLE_CNN_BILSTM_MODEL, PHOBERT_METHOD).tolist()
 
     return jsonify({'prediction': res})
 
@@ -68,7 +68,7 @@ def using_ensemble_cnn_bigru():
     title = req.get('title')
     content = req.get('content')
 
-    res = getRatingFromModel(title, content, ENSEMBLE_CNN_BIGRU, PHOBERT_METHOD).tolist()
+    res = getRatingFromModel(title, content, ENSEMBLE_CNN_BIGRU_MODEL, PHOBERT_METHOD).tolist()
 
     return jsonify({'prediction': res})
 
@@ -78,7 +78,7 @@ def using_fusion_cnn_bilstm():
     title = req.get('title')
     content = req.get('content')
 
-    res = getRatingFromModel(title, content, FUSION_CNN_BILSTM, PHOBERT_METHOD).tolist()
+    res = getRatingFromModel(title, content, FUSION_CNN_BILSTM_MODEL, PHOBERT_METHOD).tolist()
 
     return jsonify({'prediction': res})
 
@@ -88,7 +88,7 @@ def using_fusion_cnn_bigru():
     title = req.get('title')
     content = req.get('content')
 
-    res = getRatingFromModel(title, content, FUSION_CNN_BIGRU, PHOBERT_METHOD).tolist()
+    res = getRatingFromModel(title, content, FUSION_CNN_BIGRU_MODEL, PHOBERT_METHOD).tolist()
 
     return jsonify({'prediction': res})
 
