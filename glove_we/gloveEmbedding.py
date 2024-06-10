@@ -154,10 +154,16 @@ def trainGlove():
 
   glove.save(PATH + MODEL + GLOVE_MODEL)
 
-def getFeature(sentence):
+with open(PATH + MODEL + TOKENIZER_MODEL, 'rb') as pkl_file:
+    tokenizer2 = pkl.load(pkl_file)
+
+def getFeature_ML(sentence):
     sentence = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence)))]
-    with open(PATH + MODEL + TOKENIZER_MODEL, 'rb') as pkl_file:
-        tokenizer = pkl.load(pkl_file)
-    ids = getDataIDS(sentence, tokenizer)
-    emb_matrix = getEmbeddingMatrix(tokenizer)
-    return attachEmbeddingToIds(tokenizer, ids, emb_matrix)
+    ids = getDataIDS(sentence, tokenizer2)
+    emb_matrix = getEmbeddingMatrix(tokenizer2)
+
+def getFeature_DL(sentence):
+    sentence = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence)))]
+    ids = getDataIDS(sentence, tokenizer2)
+    
+    return ids

@@ -163,7 +163,6 @@ def getFeaturePrediction(sentence):
     ids = getDataIDS([sentence])
     features = []
     output = phobert(input_ids=ids, attention_mask=getAttentionMask(ids))
-    features.append(output.last_hidden_state)
-    features = np.array(features)
+    features = np.array(output.last_hidden_state)
     print(features.shape)
     return features
