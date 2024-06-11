@@ -17,9 +17,9 @@ glove_ensemble_gru = getModel(GLOVE_PATH + ENSEMBLE_CNN_BIGRU_MODEL)
 glove_fusion_lstm = getModel(GLOVE_PATH + FUSION_CNN_BILSTM_MODEL)
 glove_fusion_gru = getModel(GLOVE_PATH + FUSION_CNN_BIGRU_MODEL)
 glove_transformer = getModel(GLOVE_PATH + TRANSFORMER_MODEL)
-# glove_sgd = getModel(GLOVE_PATH + SGD_MODEL)
-# glove_rand_for = getModel(GLOVE_PATH + DECISION_FOREST_MODEL)
-# glove_log_reg = getModel(GLOVE_PATH + LOGIS_REG_MODEL)
+glove_sgd = getModel(GLOVE_PATH + SGD_MODEL)
+glove_rand_for = getModel(GLOVE_PATH + DECISION_FOREST_MODEL)
+glove_log_reg = getModel(GLOVE_PATH + LOGIS_REG_MODEL)
 
 print('LOADING GLOVE MODE DONE..................')
 phobert_cnn = getModel(PHOBERT_PATH + CNN_MODEL)
@@ -32,24 +32,30 @@ phobert_ensemble_gru = getModel(PHOBERT_PATH + ENSEMBLE_CNN_BIGRU_MODEL)
 phobert_fusion_lstm = getModel(PHOBERT_PATH + FUSION_CNN_BILSTM_MODEL)
 phobert_fusion_gru = getModel(PHOBERT_PATH + FUSION_CNN_BIGRU_MODEL)
 phobert_transformer = getModel(PHOBERT_PATH + TRANSFORMER_MODEL)
-# phobert_sgd = getModel(PHOBERT_PATH + SGD_MODEL)
-# phobert_rand_for = getModel(PHOBERT_PATH + DECISION_FOREST_MODEL)
-# phobert_log_reg = getModel(PHOBERT_PATH + LOGIS_REG_MODEL)
+phobert_sgd = getModel(PHOBERT_PATH + SGD_MODEL)
+phobert_rand_for = getModel(PHOBERT_PATH + DECISION_FOREST_MODEL)
+phobert_log_reg = getModel(PHOBERT_PATH + LOGIS_REG_MODEL)
 print('LOADING PHOBERT MODEL DONE ................')
 MACHINE_LEARNING_MODELS = [SGD_MODEL, DECISION_FOREST_MODEL, LOGIS_REG_MODEL]
 
 def getRatingFromModel(title, content, model_name, emb_tech):
     if emb_tech == GLOVE_METHOD:
-        title = getFeature_DL(title)
-        content = getFeature_DL(content)
-    else:
+        if model_name not in MACHINE_LEARNING_MODELS:
+            title = getFeature_DL(title)
+            content = getFeature_DL(content)
+        else:
+            title = getFeature_ML(title)
+            content = getFeature_ML(content)
+
+    elif emb_tech == PHOBERT_METHOD:
         title = getFeaturePrediction(title)
         content = getFeaturePrediction(content)
 
+    input = [np.array(title), np.array(content)]
+
     if model_name in MACHINE_LEARNING_MODELS:
-        pass
-    else:
-        input = [np.array(title), np.array(content)]
+        input = Concatenate(axis=-1)(input)
+        input = tf.reshape(input, (input.shape[0], -1))
 
     if emb_tech == GLOVE_METHOD:
         if model_name == CNN_MODEL:

@@ -162,6 +162,8 @@ def getFeature_ML(sentence):
     ids = getDataIDS(sentence, tokenizer2)
     emb_matrix = getEmbeddingMatrix(tokenizer2)
 
+    return attachEmbeddingToIds(tokenizer2, ids, emb_matrix)
+
 def getFeature_DL(sentence):
     sentence = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence)))]
     ids = getDataIDS(sentence, tokenizer2)
