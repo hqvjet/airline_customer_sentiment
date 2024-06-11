@@ -24,7 +24,6 @@ class TransformerBlock(Layer):
         ffn_output = self.dropout2(ffn_output, training=training)
         return self.layernorm2(out1 + ffn_output)
 
-# USING TRAINED BILSTM MODEL
 def getModel(path):
     if path == GLOVE_PATH + SGD_MODEL or path == GLOVE_PATH + LOGIS_REG_MODEL or path == GLOVE_PATH + DECISION_FOREST_MODEL or path == PHOBERT_PATH + SGD_MODEL or path == PHOBERT_PATH + LOGIS_REG_MODEL or path == PHOBERT_PATH + DECISION_FOREST_MODEL:
         model = joblib.load(path)
