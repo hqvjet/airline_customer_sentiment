@@ -126,4 +126,4 @@ def using_sgd():
     content = req.get('content')
 
     res = getRatingFromModel(title, content, SGD_MODEL, PHOBERT_METHOD).tolist()
-    return jsonify(res)
+    return jsonify({'prediction': res})
