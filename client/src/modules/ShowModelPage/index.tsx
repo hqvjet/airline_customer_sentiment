@@ -25,6 +25,8 @@ export default function ShowModelPage() {
         if (apiFunction !== null) {
             apiFunction(values.title, values.content)
                 .then((response: any) => {
+                    // --------------------------------------------------------------- DIsplay result
+                    console.log(response.data)
                     let array = []
                     for (var i = 0; i < response.data.prediction[0].length; i += 1) {
                         array.push(response.data.prediction[0][i].toFixed(4))
@@ -49,7 +51,7 @@ export default function ShowModelPage() {
 
     return (
         <Space direction="vertical" className="">
-            <Card className="bg-transparent p-10">
+            <Card className="bg-gray-800 bg-opacity-80 p-5">
                 <Col>
                     <Title><p className="text-white">LEAVE A COMMENT</p></Title>
                     <Form
