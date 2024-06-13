@@ -1,4 +1,4 @@
-import { PHOBERT_CONFIG } from ".";
+import { JSVCONFIG, PHOBERT_CONFIG } from ".";
 
 export const usingPHOBERT = {
     usingCNN: (title: string, content: string) => {
@@ -39,5 +39,14 @@ export const usingPHOBERT = {
     },
     usingRANDOM_FOREST: (title: string, content: string) => {
         return PHOBERT_CONFIG.post('/random_forest', {title: title, content: content})
+    },
+    usingKNN: (title: string, content: string) => {
+        return JSVCONFIG.post('/analyze-sentiment/', {model:'knn', title: title, content: content})
+    },
+    usingSVM: (title: string, content: string) => {
+        return JSVCONFIG.post('/analyze-sentiment/', {model:'svm', title: title, content: content})
+    },
+    usingNB: (title: string, content: string) => {
+        return JSVCONFIG.post('/analyze-sentiment/', {model:'nb', title: title, content: content})
     }
 }

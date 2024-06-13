@@ -12,6 +12,11 @@ export const PHOBERT_CONFIG = axios.create({
     timeout: 10000
 })
 
+export const JSVCONFIG = axios.create({
+    baseURL: 'http://192.168.17.191:8000',
+    timeout: 10000
+})
+
 export default function useAPI(path: string) {
     const paths = path.split('/')
     const emb = paths[2]
@@ -72,6 +77,12 @@ export default function useAPI(path: string) {
             return usingPHOBERT.usingSGD
         else if (model == 'random_forest')
             return usingPHOBERT.usingRANDOM_FOREST
+        else if (model == 'knn')
+            return usingPHOBERT.usingKNN
+        else if (model == 'svm')
+            return usingPHOBERT.usingSVM
+        else if (model == 'nb')
+            return usingPHOBERT.usingNB
     }
 
     return null
