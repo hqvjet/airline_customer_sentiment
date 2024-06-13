@@ -69,139 +69,139 @@ export const MODEL_LIST = {
     phobert: [
         {
             name: 'CNN MODEL',
-            accuracy: '80%',
+            accuracy: '89%',
             path: 'cnn'
         },
         {
             name: 'LSTM MODEL',
-            accuracy: '80%',
+            accuracy: '88%',
             path: 'lstm'
         },
         {
             name: 'BiLSTM MODEL',
-            accuracy: '80%',
+            accuracy: '88%',
             path: 'bilstm'
         },
         {
             name: 'GRU MODEL',
-            accuracy: '80%',
+            accuracy: '88%',
             path: 'gru'
         },
         {
             name: 'BiGRU MODEL',
-            accuracy: '80%',
+            accuracy: '88%',
             path: 'bigru'
         },
         {
             name: 'ENSEMBLE CNN + BiLSTM',
-            accuracy: '80%',
+            accuracy: '96%',
             path: 'ensemble_cnn_bilstm'
         },
         {
             name: 'FUSION CNN + BiLSTM',
-            accuracy: '80%',
+            accuracy: '89%',
             path: 'fusion_cnn_bilstm'
         },
         {
             name: 'FUSION CNN BiGRU',
-            accuracy: '80%',
+            accuracy: '87%',
             path: 'fusion_cnn_bigru'
         },
         {
             name: 'TRANSFORMER',
-            accuracy: '80%',
+            accuracy: '92%',
             path: 'transformer'
         },
         {
             name: 'RANDOM FOREST',
-            accuracy: '80%',
+            accuracy: '76%',
             path: 'random_forest'
         },
         {
             name: 'SGD',
-            accuracy: '80%',
+            accuracy: '88%',
             path: 'sgd'
         },
         {
             name: 'LOGISTIC REGRESSION',
-            accuracy: '80%',
+            accuracy: '97%',
             path: 'logistic'
         },
         {
             name: 'K-NEAREST NEIGHBORS (KNN)',
-            accuracy: '80%',
+            accuracy: '83%',
             path: 'knn'
         },
         {
             name: 'SUPPORT VECTOR MACHINE (SVM)',
-            accuracy: '80%',
+            accuracy: '82%',
             path: 'svm'
         },
         {
             name: 'NAIVE BAYES',
-            accuracy: '80%',
+            accuracy: '68%',
             path: 'nb'
         }
     ],
     glove: [
         {
             name: 'CNN MODEL',
-            accuracy: '80%',
+            accuracy: '90%',
             path: 'cnn'
         },
         {
             name: 'LSTM MODEL',
-            accuracy: '80%',
+            accuracy: '88%',
             path: 'lstm'
         },
         {
             name: 'BiLSTM MODEL',
-            accuracy: '80%',
+            accuracy: '89%',
             path: 'bilstm'
         },
         {
             name: 'GRU MODEL',
-            accuracy: '80%',
+            accuracy: '85%',
             path: 'gru'
         },
         {
             name: 'BiGRU MODEL',
-            accuracy: '80%',
+            accuracy: '86%',
             path: 'bigru'
         },
         {
             name: 'ENSEMBLE CNN + BiLSTM',
-            accuracy: '80%',
+            accuracy: '93%',
             path: 'ensemble_cnn_bilstm'
         },
         {
             name: 'FUSION CNN + BiLSTM',
-            accuracy: '80%',
+            accuracy: '86%',
             path: 'fusion_cnn_bilstm'
         },
         {
             name: 'FUSION CNN BiGRU',
-            accuracy: '80%',
+            accuracy: '87%',
             path: 'fusion_cnn_bigru'
         },
         {
             name: 'TRANSFORMER',
-            accuracy: '80%',
+            accuracy: '86%',
             path: 'transformer'
         },
         {
             name: 'RANDOM FOREST',
-            accuracy: '80%',
+            accuracy: '73%',
             path: 'random_forest'
         },
         {
             name: 'SGD',
-            accuracy: '80%',
+            accuracy: '84%',
             path: 'sgd'
         },
         {
             name: 'LOGISTIC REGRESSION',
-            accuracy: '80%',
+            accuracy: '79%',
             path: 'logistic'
         }
     ]
