@@ -122,26 +122,26 @@ export const MODEL_LIST = {
             accuracy: '88%',
             path: 'sgd'
         },
-        {
-            name: 'LOGISTIC REGRESSION',
-            accuracy: '97%',
-            path: 'logistic'
-        },
-        {
-            name: 'K-NEAREST NEIGHBORS (KNN)',
-            accuracy: '83%',
-            path: 'knn'
-        },
-        {
-            name: 'SUPPORT VECTOR MACHINE (SVM)',
-            accuracy: '82%',
-            path: 'svm'
-        },
-        {
-            name: 'NAIVE BAYES',
-            accuracy: '68%',
-            path: 'nb'
-        }
+        // {
+        //     name: 'LOGISTIC REGRESSION',
+        //     accuracy: '97%',
+        //     path: 'logistic'
+        // },
+        // {
+        //     name: 'K-NEAREST NEIGHBORS (KNN)',
+        //     accuracy: '85%',
+        //     path: 'knn'
+        // },
+        // {
+        //     name: 'SUPPORT VECTOR MACHINE (SVM)',
+        //     accuracy: '82%',
+        //     path: 'svm'
+        // },
+        // {
+        //     name: 'NAIVE BAYES',
+        //     accuracy: '68%',
+        //     path: 'nb'
+        // }
     ],
     glove: [
         {
@@ -199,10 +199,10 @@ export const MODEL_LIST = {
             accuracy: '84%',
             path: 'sgd'
         },
-        {
-            name: 'LOGISTIC REGRESSION',
-            accuracy: '79%',
-            path: 'logistic'
-        }
+        // {
+        //     name: 'LOGISTIC REGRESSION',
+        //     accuracy: '79%',
+        //     path: 'logistic'
+        // }
     ]
 }

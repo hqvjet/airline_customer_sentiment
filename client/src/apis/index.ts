@@ -13,7 +13,7 @@ export const PHOBERT_CONFIG = axios.create({
 })
 
 export const JSVCONFIG = axios.create({
-    baseURL: 'http://192.168.17.191:8000',
+    baseURL: 'http://198.162.146.106:8000',
     timeout: 10000
 })
 

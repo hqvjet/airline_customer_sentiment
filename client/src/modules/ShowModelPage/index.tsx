@@ -97,11 +97,11 @@ export default function ShowModelPage() {
                 </Col>
             </Card>
             {prediction.length > 1 ?
-            (<Row justify={'center'} align={'middle'}>
+            (<Row justify={'center'} align={'middle'} classname="border-solid bg-black-900">
                 <Col className="w-2/3">
-                    <Title level={3}><p className="text-white">Negative: {prediction[0]}</p></Title>
-                    <Title level={3}><p className="text-white">Neutral: {prediction[1]}</p></Title>
-                    <Title level={3}><p className="text-white">Positive: {prediction[2]}</p></Title>
+                    <Title level={3}><p className="text-red-500 text-center text-shadow">Negative: {prediction[0]}</p></Title>
+                    <Title level={3}><p className="text-orange-400 text-center">Neutral: {prediction[1]}</p></Title>
+                    <Title level={3}><p className="text-green-400 text-center">Positive: {prediction[2]}</p></Title>
                 </Col>
             </Row>) :
             (<></>)
