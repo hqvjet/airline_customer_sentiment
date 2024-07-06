@@ -1,9 +1,0 @@
-pandas
-numpy
-tensorflow
-torch
-transformers
-scikit-learn
-vncorenlp
-fairseq
-fastBPE

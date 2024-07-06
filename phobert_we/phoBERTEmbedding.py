@@ -18,8 +18,9 @@ import torch
 from phobert_we.constants import *
 from phobert_we.Nomarlize import normalizeSentence, statusToNumber
 import numpy as np
-from transformers import AutoModel, TFAutoModel, AutoTokenizer
+from transformers import BertTokenizer, TFBertModel
 import tensorflow as tf
+import math
 # LOAD MODEL AND BPE
 # parser = argparse.ArgumentParser()
 # parser.add_argument('--bpe-codes', 
@@ -30,31 +31,11 @@ import tensorflow as tf
 # )
 # args, unknown = parser.parse_known_args()
 # bpe = fastBPE(args)
-rdr = VnCoreNLP("tools/vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
 # Load the dictionary
 # vocab = Dictionary()
 # vocab.add_from_file(PATH + "PhoBERT_large_transformers/dict.txt")
-tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base-v2")
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
-def test():
-    phobert, tokenizer = loadPhobert()
-    data = ['Tôi là sinh viên trường đại học bách khoa hà nội', 'Nhiều khi anh mong được một lần nói ra hết tất cả thay vì']
-    print(torch.tensor([tokenizer.encode(data[0])]))
-
-    data = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence))) for sentence in data]
-    print(data)
-    print(bpe.encode(data[0]))
-    print(tokenizer.encode(data[0]))
-    print(vocab.encode_line(data[0], append_eos=True, add_if_not_exist=False).long().tolist())
-    
-
-def loadPhobert():
-    print('Loading PhoBERT model............')
-    phobert = TFAutoModel.from_pretrained("vinai/phobert-large")
-    tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-large")
-
-    return phobert, tokenizer
-    
 def getDataIDS(data):
     data_ids = []
     for sentence in data:
@@ -70,42 +51,27 @@ def getAttentionMask(data_ids):
 
     return data_masks
 
-def prepareData(title, text):
-    # TOKENIZE DATASET
-    print('TOKENIZING DATASET.......................................')
-    title = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence))) for sentence in title]
-    text = [normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence))) for sentence in text]
-
+def prepareData(text):
     # MAPPING TO VOCAB
     print('MAPPING AND PADDING DATASET..............................')
-    title_ids = getDataIDS(title)
     text_ids = getDataIDS(text)
 
-    # # CREATE MASK
-    # title_masks = getMask(title_ids)
-    # text_masks = getMask(text_ids)
-
-    # data = TensorDataset(title_ids, title_masks, label)
-    # data_sampler = SequentialSampler(data)
-    # dataloader = DataLoader(data, sampler=data_sampler, batch_size=BATCH_SIZE)
-
-    return title_ids, text_ids
+    return text_ids
 
 def getDataset(file_name):
     # GET FROM CSV (ORIGINAL TEXT)
     print('READING DATASET FROM FILE................................')
-    file = pd.read_csv(PATH + file_name)
+    file = pd.read_csv(file_name)
 
-    title = file['Title'].apply(str)
-    text = file['Content'].apply(str)
-
-    threshold = (8000 // PHOBERT_BATCH_SIZE) * PHOBERT_BATCH_SIZE
-    return title[:threshold], text[:threshold]
+    text = file['Review'].astype(str).str.strip().str.replace(r'\s+', ' ', regex=True).str.replace(r'\r', ' ', regex=True).str.lower()[:10000]
+    
+    print(text.info)
+    return text
 
 def getFeature(ids):
 
     print('LOADING PHOBERT MODEL......................')
-    phobert = TFAutoModel.from_pretrained("vinai/phobert-base-v2", from_pt=True)
+    phobert = TFBertModel.from_pretrained("bert-base-uncased", from_pt=True)
     features = []
 
     print('EXTRACTING FEATURES........................')
@@ -117,14 +83,16 @@ def getFeature(ids):
     #     output = phobert(input_ids=ids_element.numpy())
     #
     #     features.append(output[0].numpy())
-        # print(features[-1].shape)
+    # print(features[-1].shape)
 
-    num_batches = ids.shape[0] // PHOBERT_BATCH_SIZE
+    num_batches = math.ceil(ids.shape[0] // PHOBERT_BATCH_SIZE)
 
     for batch in range(num_batches):
-        batch_element = ids[batch * PHOBERT_BATCH_SIZE : (batch + 1) * PHOBERT_BATCH_SIZE]
+        batch_element = ids[batch * PHOBERT_BATCH_SIZE : min((batch + 1) * PHOBERT_BATCH_SIZE, ids.shape[0])]
         output = phobert(input_ids=batch_element, attention_mask=getAttentionMask(batch_element))
         features.append(output.last_hidden_state)
+
+        print(f'Batch number {batch + 1} finished, Shape: {output.last_hidden_state.shape}')
     # output = phobert(input_ids=ids)
     features = tf.concat(features, axis=0)
     # features = features.reshape(len(ids), MAX_LEN, 768)
@@ -136,16 +104,14 @@ def getFeature(ids):
     return features
 
 def extractFeatures():
-    title, text = getDataset('data.csv')
+    text = getDataset('hf://datasets/florentgbelidji/car-reviews/train_car.csv')
 
     # IDS input
-    title_ids, text_ids = prepareData(title, text)
+    text_ids = prepareData(text)
 
     # GET features
-    title_features = getFeature(title_ids)
     text_features = getFeature(text_ids)
 
-    np.save(PATH + MODEL + PHOBERT_FEATURES_TITLE, title_features)
     np.save(PATH + MODEL + PHOBERT_FEATURES_TEXT, text_features)
 
     print('SAVED.....................')
@@ -157,7 +123,7 @@ def extractFeatures():
     #
     # return title_train, text_train, train_labels, title_val, text_val, val_labels, title_test, text_test, test_labels
 
-phobert = TFAutoModel.from_pretrained("vinai/phobert-base-v2", from_pt=True)
+phobert = TFBertModel.from_pretrained("bert-base-uncased", from_pt=True)
 def getFeaturePrediction(sentence):
     sentence = normalizeSentence(' '.join(' '.join(i) for i in rdr.tokenize(sentence)))
     ids = getDataIDS([sentence])

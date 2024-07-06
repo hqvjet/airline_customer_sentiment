@@ -27,18 +27,11 @@ def statusToNumber(sentence):
         return 3
 
 
-def arrayToStatus(array):
-    max_val = array[0]
-    status = 1
-    for i in range(1, 3):
-        if array[i] > max_val:
-            max = array[i]
-            status = i + 1
-
-    if status == 1:
-        return 'neg'
-    elif status == 2:
-        return 'neu'
-    elif status == 3:
-        return 'pos'
+def arrayToStatus(status):
+    neg = [1, 2, 3]
+    pos = [4, 5]
+    if status in neg:
+        return 1
+    elif status in pos:
+        return 2
 
