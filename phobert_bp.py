@@ -2,9 +2,9 @@ from flask import Blueprint, request, jsonify
 from appService import getRatingFromModel
 from constants import *
 
-phobert = Blueprint('phobert', __name__, url_prefix="/api/v1/phobert")
+phobert = Blueprint('phobert', __name__, url_prefix="/api/v1")
 
-@phobert.post('/ensemble_cnn_bilstm')
+@phobert.post('/predict')
 def using_ensemble_cnn_bilstm():
     req = request.get_json()
     title = req.get('title')
