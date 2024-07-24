@@ -15,8 +15,8 @@ from fairseq.data import Dictionary
 import argparse
 import pandas as pd
 import torch
-from phobert_we.constants import *
-from phobert_we.Nomarlize import normalizeSentence, statusToNumber
+from constants import *
+from Nomarlize import normalizeSentence, statusToNumber
 import numpy as np
 from transformers import AutoModel, TFAutoModel, AutoTokenizer
 import tensorflow as tf

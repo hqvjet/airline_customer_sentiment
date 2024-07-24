@@ -25,53 +25,53 @@ title_train_ids, text_train_ids, train_labels, title_val_ids, text_val_ids, val_
 
 # MODEL IMPLEMENTATION AND TRAINING
 def startLearning():
-  # print('TRAINING USING CNN MODEL.......................')
-  # cnn = CNN(
-  #   title_train_ids,
-  #   text_train_ids,
-  #   train_labels,
-  #   title_val_ids,
-  #   text_val_ids,
-  #   val_labels,
-  # )
-  #
-  # cnn_model = cnn.trainModel()
-  # cnn.testModel(
-  #   [np.array(title_test_ids), np.array(text_test_ids)], 
-  #   np.array(test_labels)
-  # )
-  
-  # print('TRAINING USING BiLSTM MODEL......................')
-  # bilstm = BiLSTM(
-  #   title_train_ids,
-  #   text_train_ids,
-  #   train_labels,
-  #   title_val_ids,
-  #   text_val_ids,
-  #   val_labels,
-  # )
-  #
-  # bilstm_model = bilstm.trainModel()
-  # bilstm.testModel(
-  #   [np.array(title_test_ids), np.array(text_test_ids)], 
-  #   np.array(test_labels)
-  # )
-  
-    # print('TRAINING USING ENSEMBLE CNN + BiLSTM MODEL.................')
-    # ensemble_cnn_bilstm = Ensemble_CNN_BILSTM(
-    #     title_train_ids,
-    #     text_train_ids,
-    #     train_labels,
-    #     title_val_ids,
-    #     text_val_ids,
-    #     val_labels,
-    # )
-    #
-    # ensemble_cnn_bilstm.trainModel()
-    # ensemble_cnn_bilstm.testModel(
-    #     [np.array(title_test_ids), np.array(text_test_ids)], 
-    #     np.array(test_labels)
-    # )
+    print('TRAINING USING CNN MODEL.......................')
+    cnn = CNN(
+    title_train_ids,
+    text_train_ids,
+    train_labels,
+    title_val_ids,
+    text_val_ids,
+    val_labels,
+    )
+
+    cnn_model = cnn.trainModel()
+    cnn.testModel(
+    [np.array(title_test_ids), np.array(text_test_ids)], 
+    np.array(test_labels)
+    )
+
+    print('TRAINING USING BiLSTM MODEL......................')
+    bilstm = BiLSTM(
+    title_train_ids,
+    text_train_ids,
+    train_labels,
+    title_val_ids,
+    text_val_ids,
+    val_labels,
+    )
+
+    bilstm_model = bilstm.trainModel()
+    bilstm.testModel(
+    [np.array(title_test_ids), np.array(text_test_ids)], 
+    np.array(test_labels)
+    )
+
+    print('TRAINING USING ENSEMBLE CNN + BiLSTM MODEL.................')
+    ensemble_cnn_bilstm = Ensemble_CNN_BILSTM(
+        title_train_ids,
+        text_train_ids,
+        train_labels,
+        title_val_ids,
+        text_val_ids,
+        val_labels,
+    )
+
+    ensemble_cnn_bilstm.trainModel()
+    ensemble_cnn_bilstm.testModel(
+        [np.array(title_test_ids), np.array(text_test_ids)], 
+        np.array(test_labels)
+    )
 
     print('TRAINING USING FUSION CNN + BiLSTM MODEL.................')
     fusion_cnn_bilstm = Fusion_CNN_BILSTM(
