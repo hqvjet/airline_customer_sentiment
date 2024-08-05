@@ -1,6 +1,7 @@
 resources/PhoBERT_large_transformers
 resources/vncorenlp
 resources/phobert/models
+resources/phobert/bwd
 venv
 __pycache__
 

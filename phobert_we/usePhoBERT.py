@@ -7,7 +7,7 @@ from phobert_we.Nomarlize import *
 
 def usePhoBERT():
     print('READING PhoBERT FEATURES.................................')
-    text_train = np.load(PATH + MODEL + PHOBERT_FEATURES_TEXT)
+    text_train = np.load('phobert_we/resources/phobert/bwd/features.npy')
     print(f'Shape: {text_train.shape}')
 
     print('READING DATASET FROM FILE................................')

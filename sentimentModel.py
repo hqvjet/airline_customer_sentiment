@@ -4,13 +4,13 @@ from phobert_we.constants import *
 from phobert_we.usePhoBERT import usePhoBERT
 from phobert_we.models.BILSTM import BiLSTM
 # from phobert_we.models.LSTM import LSTM
-from phobert_we.models.CNN import CNN
-from phobert_we.models.Ensemble_CNN_BILSTM import Ensemble_CNN_BILSTM
+# from phobert_we.models.CNN import CNN
+# from phobert_we.models.Ensemble_CNN_BILSTM import Ensemble_CNN_BILSTM
 # from models.Fusion_CNN_BILSTM import Fusion_CNN_BILSTM
 # from models.Transformer import Transformer
 # from models.SGD import SGD
 # from models.KNN import KNN
-from phobert_we.models.LOGISTIC_REGRESSION import LOGISTIC_REGRESSION
+# from phobert_we.models.LOGISTIC_REGRESSION import LOGISTIC_REGRESSION
 # from models.DECISION_FOREST import DECISION_FOREST
 # from models.GRU import GRU
 # from models.BIGRU import BIGRU
@@ -37,33 +37,33 @@ def startLearning():
   #   np.array(test_labels)
   # )
   
-  # print('TRAINING USING BiLSTM MODEL......................')
-  # bilstm = BiLSTM(
-  #   text_train_ids,
-  #   train_labels,
-  #   text_val_ids,
-  #   val_labels,
-  # )
-  #
-  # bilstm_model = bilstm.trainModel()
-  # bilstm.testModel(
-  #   np.array(text_test_ids), 
-  #   np.array(test_labels)
-  # )
-  
-    print('TRAINING USING ENSEMBLE CNN + BiLSTM MODEL.................')
-    ensemble_cnn_bilstm = Ensemble_CNN_BILSTM(
-        text_train_ids,
-        train_labels,
-        text_val_ids,
-        val_labels,
-    )
+  print('TRAINING USING BiLSTM MODEL......................')
+  bilstm = BiLSTM(
+    text_train_ids,
+    train_labels,
+    text_val_ids,
+    val_labels,
+  )
 
-    ensemble_cnn_bilstm.trainModel()
-    ensemble_cnn_bilstm.testModel(
-        np.array(text_test_ids), 
-        np.array(test_labels)
-    )
+  bilstm_model = bilstm.trainModel()
+  bilstm.testModel(
+    np.array(text_test_ids), 
+    np.array(test_labels)
+  )
+  
+    # print('TRAINING USING ENSEMBLE CNN + BiLSTM MODEL.................')
+    # ensemble_cnn_bilstm = Ensemble_CNN_BILSTM(
+    #     text_train_ids,
+    #     train_labels,
+    #     text_val_ids,
+    #     val_labels,
+    # )
+    #
+    # # ensemble_cnn_bilstm.trainModel()
+    # ensemble_cnn_bilstm.testModel(
+    #     np.array(text_test_ids), 
+    #     np.array(test_labels)
+    # )
 
     # print('TRAINING USING FUSION CNN + BiLSTM MODEL.................')
     # fusion_cnn_bilstm = Fusion_CNN_BILSTM(

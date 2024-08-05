@@ -68,13 +68,13 @@ class BiLSTM:
         model_BiLSTM.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         model_BiLSTM.summary()
 
-        plot_model(model_BiLSTM, to_file=PATH + MODEL_IMAGE + BILSTM_IMAGE, show_shapes=True, show_layer_names=True)
+        # plot_model(model_BiLSTM, to_file=PATH + MODEL_IMAGE + BILSTM_IMAGE, show_shapes=True, show_layer_names=True)
 
         return model_BiLSTM
 
     def trainModel(self):
         early_stopping = EarlyStopping(monitor='val_accuracy', patience=STOP_PATIENCE, verbose=1, mode='max')
-        checkpoint = ModelCheckpoint(PATH + MODEL + BILSTM_MODEL, save_best_only=True, monitor='val_accuracy', mode='max')
+        checkpoint = ModelCheckpoint('phobert_we/resources/phobert/bwd/model.keras', save_best_only=True, monitor='val_accuracy', mode='max')
         history = self.model.fit(
             np.array(self.train_text),
             self.train_rating,
@@ -87,15 +87,15 @@ class BiLSTM:
 
         # self.model.save(PATH + BILSTM_MODEL)
 
-        plt.figure()
-        plt.plot(history.history['accuracy'], label='Train Accuracy')
-        plt.plot(history.history['loss'], label='Train Loss')
-        plt.title('BiLSTM Model')
-        plt.ylabel('Value')
-        plt.xlabel('Epoch')
-        plt.legend()
-        plt.savefig(PATH + CHART + BILSTM_CHART)
-        plt.close()
+        # plt.figure()
+        # plt.plot(history.history['accuracy'], label='Train Accuracy')
+        # plt.plot(history.history['loss'], label='Train Loss')
+        # plt.title('BiLSTM Model')
+        # plt.ylabel('Value')
+        # plt.xlabel('Epoch')
+        # plt.legend()
+        # plt.savefig(PATH + CHART + BILSTM_CHART)
+        # plt.close()
 
         return self.model
     
@@ -109,7 +109,7 @@ class BiLSTM:
         report += acc_line
         print(report)
 
-        with open(PATH + REPORT + BILSTM_REPORT, 'w') as file:
-            print(report, file=file)
+        # with open(PATH + REPORT + BILSTM_REPORT, 'w') as file:
+        #     print(report, file=file)
 
         print(f"Classification report saved to {PATH + REPORT + BILSTM_REPORT}..................")

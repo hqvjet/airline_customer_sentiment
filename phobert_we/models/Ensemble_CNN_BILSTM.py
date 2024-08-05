@@ -24,8 +24,8 @@ class Ensemble_CNN_BILSTM:
         self.train_rating = train_rating
         self.val_text = val_text
         self.val_rating = val_rating
-        self.output = self.getOutput()
-        self.model = self.buildModel()
+        # self.output = self.getOutput()
+        # self.model = self.buildModel()
 
     def getOutput(self):
         # Define input layers for the title and text inputs

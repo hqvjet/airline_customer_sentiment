@@ -32,6 +32,7 @@ import math
 # args, unknown = parser.parse_known_args()
 # bpe = fastBPE(args)
 # Load the dictionary
+rdr = VnCoreNLP("tools/vncorenlp/VnCoreNLP-1.1.1.jar", annotators="wseg", max_heap_size='-Xmx500m')
 # vocab = Dictionary()
 # vocab.add_from_file(PATH + "PhoBERT_large_transformers/dict.txt")
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
@@ -112,7 +113,7 @@ def extractFeatures():
     # GET features
     text_features = getFeature(text_ids)
 
-    np.save(PATH + MODEL + PHOBERT_FEATURES_TEXT, text_features)
+    np.save('phobert_we/resources/phobert/bwd/features.npy', text_features)
 
     print('SAVED.....................')
 
@@ -130,5 +131,4 @@ def getFeaturePrediction(sentence):
     features = []
     output = phobert(input_ids=ids, attention_mask=getAttentionMask(ids))
     features = np.array(output.last_hidden_state)
-    print(features.shape)
     return features
